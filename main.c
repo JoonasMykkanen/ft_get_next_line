@@ -10,16 +10,39 @@
 # define BUFFER_SIZE 3
 #endif
 
-typedef struct s_str
+char	*build_str(char **storage, char *temp, int ret)
 {
-	char	*ptr;
-	size_t	len;
-	size_t	i;
+	int		i;
+	char	c;
+
+	i = 0;
+	c = temp[i];
+	while (c != '\n')
+	{
+		c = temp[i];
+		if (c == '\n')
+			write(1, "FOUND\n", 5);
+		i++;
+	}
 }
 
-char	*read_line()
+char	*read_line(int fd)
 {
-	
+	int		ret;
+	char	*temp;
+	char	*storage;
+	char	buf[BUFFER_SIZE];
+
+	ret = read(fd, buf, BUFFER_SIZE);
+	temp = malloc(sizeof(char) * ret);
+	storage = malloc(sizeof(char) * ret);
+	while (ret)
+	{
+		memcpy(temp, buf, ret);
+		storage = build_str(&storage, temp, ret);
+		// write(1, temp, 3);
+		ret = read(fd, buf, BUFFER_SIZE);
+	}
 }
 
 char	*get_next_line(int fd)
