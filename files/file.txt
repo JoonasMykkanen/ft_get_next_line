@@ -1,0 +1,7 @@
+1st This is first line.
+2nd This is\n second line!
+3th This x is \r third line?!
+4th This has some //77//\\ special shit going on
+5th How about\n\\n nulls? \0 do I see this?
+6th This is after all the hard shit, seems to be working
+7th line.
