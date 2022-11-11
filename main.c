@@ -10,20 +10,36 @@
 # define BUFFER_SIZE 3
 #endif
 
-char	*build_str(char **storage, char *temp, int ret)
+void	handle_overflow()
 {
-	int		i;
-	char	c;
+
+}
+
+char	*build_str(char *storage, char *temp, int ret)
+{
+	static int	index = 0;
+	char		*str;
+	char		c;
+	int			i;
 
 	i = 0;
 	c = temp[i];
-	while (c != '\n')
+	str = malloc(sizeof(char) * (index + ret));
+	memcpy(str, storage, index);
+	while (c != '\n' && i < ret)
 	{
 		c = temp[i];
 		if (c == '\n')
-			write(1, "FOUND\n", 5);
+		{
+			handle_overflow();
+		}
+		str[index + i] = c;
+		write(1, &str[i], 1);
+		write(1, "\n", 1);
 		i++;
 	}
+	index += i;
+	return (str);
 }
 
 char	*read_line(int fd)
@@ -35,11 +51,10 @@ char	*read_line(int fd)
 
 	ret = read(fd, buf, BUFFER_SIZE);
 	temp = malloc(sizeof(char) * ret);
-	storage = malloc(sizeof(char) * ret);
 	while (ret)
 	{
 		memcpy(temp, buf, ret);
-		storage = build_str(&storage, temp, ret);
+		storage = build_str(storage, temp, ret);
 		// write(1, temp, 3);
 		ret = read(fd, buf, BUFFER_SIZE);
 	}
