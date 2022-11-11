@@ -1,5 +1,12 @@
 
 
+#include <stdio.h>
+
+void	math(int *trigger)
+{
+	*trigger = 1;
+}
+
 
 
 
@@ -8,6 +15,13 @@
 int	main()
 {
 	char	*str;
+	int	trigger = 0;
+	
+
+
+	math(&trigger);
+	printf("%d", trigger);
+
 
 	str = "Hello World!";
 
