@@ -10,6 +10,37 @@
 # define BUFFER_SIZE 3
 #endif
 
+
+void	*ft_memcpy(void *dst, const void *src, size_t n)
+{
+	size_t			i;
+	unsigned char	*d;
+	unsigned char	*s;
+
+	d = (unsigned char *)dst;
+	s = (unsigned char *)src;
+	i = 0;
+	if (d == NULL && s == NULL)
+		return (d);
+	while (i < n)
+	{
+		d[i] = s[i];
+		i++;
+	}
+	return (dst);
+}
+
+
+
+
+
+
+
+
+
+
+
+
 void	handle_overflow()
 {
 
@@ -24,20 +55,21 @@ char	*build_str(char *storage, char *temp, int ret, int *trigger)
 
 	i = 0;
 	c = temp[i];
-	str = malloc(sizeof(char) * (index + ret));
-	memcpy(str, storage, index);
+	str = malloc(sizeof(char) * (index + ret + 1));
+	ft_memcpy(str, storage, index);
 	while (c != '\n' && i < ret)
 	{
 		c = temp[i];
+		str[index + i] = c;
 		if (c == '\n')
 		{
+			str[index + i + 1] = '\0'; 
 			*trigger = 1;
-			// handle_overflow();
+			index = 0;
 			return (str);
 		}
-		str[index + i] = c;
-		// printf("current index: %d\n", (index + i));
-		write(1, &str[index + i], 1);
+		printf("current index: %d str: %c\n", (index + i), str[index + i]);
+		// write(1, &str[index + i], 1);
 		// write(1, "\n", 1);
 		i++;
 	}
@@ -45,7 +77,7 @@ char	*build_str(char *storage, char *temp, int ret, int *trigger)
 	return (str);
 }
 
-char	*read_line(int fd)
+char	*read_line(int fd, char **buff)
 {
 	int		ret;
 	char	*temp;
@@ -55,17 +87,25 @@ char	*read_line(int fd)
 
 	trigger = 0;
 	ret = read(fd, buf, BUFFER_SIZE);
+	if (!ret)
+		return (NULL);
 	temp = malloc(sizeof(char) * ret);
+	if (!temp)
+		return (NULL);
 	while (ret)
 	{
-		memcpy(temp, buf, ret);
+		ft_memcpy(temp, buf, ret);
 		storage = build_str(storage, temp, ret, &trigger);
 		if (trigger == 1)
 		{
+			handle_overflow();
 			break ;
 		}
 		ret = read(fd, buf, BUFFER_SIZE);
 	}
+	int	xy = strlen(storage);
+	// write(1, storage, xy);
+	return (storage);
 }
 
 char	*get_next_line(int fd)
@@ -75,19 +115,46 @@ char	*get_next_line(int fd)
 	int			found;
 	int			ret;
 
-	line = read_line(fd);
+	line = read_line(fd, &buff);
 	// buff = overflow read bufferista
 	return (line);
 }
+
+
+
 
 int	main()
 {
 	int		fd;
 	char	*file;
+	char 	*line;
 	
-	file = "files/file.txt";
+	file = "files/41_no_nl";
 	fd = open(file, O_RDONLY);
-	get_next_line(fd);
+
+	// line = get_next_line(fd);
+	// printf("%s", line);
+
+	// line = get_next_line(fd);
+	// printf("%s", line);
+
+	line = get_next_line(fd);
+	printf("%s", line);
+	line = get_next_line(fd);
+	printf("%s", line);
+	line = get_next_line(fd);
+	printf("%s", line);
+	line = get_next_line(fd);
+	printf("%s", line);
+	line = get_next_line(fd);
+	printf("%s", line);
+	line = get_next_line(fd);
+	printf("%s", line);
+	line = get_next_line(fd);
+	printf("%s", line);
+	line = get_next_line(fd);
+	printf("%s", line);
+	
 	close(fd);
 	return (0);
 }
