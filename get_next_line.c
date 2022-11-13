@@ -9,7 +9,7 @@
 
 
 #ifndef BUFFER_SIZE
-# define BUFFER_SIZE 3
+# define BUFFER_SIZE 15
 #endif
 
 
@@ -55,7 +55,7 @@ char	*build_str(char *storage, char *temp, int ret, int *trigger)
 			index = 0;
 			return (str);
 		}
-		printf("current index: %d str: %c\n", (index + i), str[index + i]);
+		// printf("current index: %d str: %c\n", (index + i), str[index + i]);
 		// write(1, &str[index + i], 1);
 		// write(1, "\n", 1);
 		i++;
@@ -64,7 +64,7 @@ char	*build_str(char *storage, char *temp, int ret, int *trigger)
 	return (str);
 }
 
-char	*read_line(int fd, char **buff)
+char	*read_line(int fd)
 {
 	int		ret;
 	char	*temp;
@@ -85,24 +85,22 @@ char	*read_line(int fd, char **buff)
 		storage = build_str(storage, temp, ret, &trigger);
 		if (trigger == 1)
 		{
-			handle_overflow();
+			// handle_overflow();
 			break ;
 		}
 		ret = read(fd, buf, BUFFER_SIZE);
 	}
-	int	xy = strlen(storage);
+	// int	xy = strlen(storage);
 	// write(1, storage, xy);
 	return (storage);
 }
 
 char	*get_next_line(int fd)
 {
-	static char	*buff;
+	// static char	*buff;
 	char		*line;
-	int			found;
-	int			ret;
 
-	line = read_line(fd, &buff);
+	line = read_line(fd);
 	// buff = overflow read bufferista
 	return (line);
 }

@@ -1,30 +1,41 @@
 
-
+#include <sys/types.h>
+#include <sys/uio.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include "get_next_line.h"
+#include <string.h>
 #include <stdio.h>
 
-void	math(int *trigger)
+
+void	*ft_memcpy(void *dst, const void *src, size_t n)
 {
-	*trigger = 1;
+	size_t			i;
+	unsigned char	*d;
+	unsigned char	*s;
+
+	d = (unsigned char *)dst;
+	s = (unsigned char *)src;
+	i = 0;
+	if (d == NULL && s == NULL)
+		return (d);
+	while (i < n)
+	{
+		d[i] = s[i];
+		i++;
+	}
+	return (dst);
 }
 
 
-
-
-#include <unistd.h>
-
-int	main()
-{
-	char	*str;
-	int	trigger = 0;
-	
-
-
-	math(&trigger);
-	printf("%d", trigger);
-
-
-	str = "Hello World!";
-
-	write(1, &str[4], 1);
-	return 0;
+int main () {
+   const char src[50] = "http://www.tutorialspoint.com";
+   char dest[50];
+   strcpy(dest,"1234567890");
+   printf("Before memcpy dest = %s\n", dest);
+   memcpy(dest + 5, src, (strlen(src)+1) - 5);
+   printf("After memcpy dest = %s\n", dest);
+   
+   return(0);
 }
