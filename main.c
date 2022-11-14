@@ -7,7 +7,7 @@
 #include <string.h>
 
 #ifndef BUFFER_SIZE
-# define BUFFER_SIZE 100
+# define BUFFER_SIZE 15
 #endif
 
 size_t	ft_strlen(char const *s)
@@ -92,7 +92,7 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	return (str);
 }
 
-char	*handle_overflow(int ret, char *temp, char **buff, int *index)
+char	*handle_overflow(unsigned int ret, char *temp, int *index)
 {
 	unsigned int	len;
 	char 			*storage;
@@ -108,8 +108,6 @@ char	*handle_overflow(int ret, char *temp, char **buff, int *index)
 	*index += 1;
 	len++;
 	len = ret - len;
-	// printf("overflow len: %d\n", len);
-	// printf("index: %d\n", *index);
 	storage = malloc(sizeof(char) * (len + 1));
 	if (!storage || len < 1)
 	{
@@ -118,11 +116,10 @@ char	*handle_overflow(int ret, char *temp, char **buff, int *index)
 	}
 	ft_memcpy(storage, temp + *index, len);
 	storage[len + 1] = '\0';
-	// printf("Current overflow buffer: %s ---///\n", storage);
 	return (storage);
 }
 
-char	*build_str(char *storage, char *temp, int ret, int *trigger)
+char	*build_str(char *storage, char *temp,unsigned int ret, int *trigger)
 {
 	static int	index = 0;
 	char		*str;
@@ -141,13 +138,9 @@ char	*build_str(char *storage, char *temp, int ret, int *trigger)
 		{
 			str[index + i + 1] = '\0';
 			*trigger = 1;
-			// printf("Line found: %s\n", str);
 			index = 0;
 			return (str);
 		}
-		// printf("current index: %d str: %c\n", (index + i), str[index + i]);
-		// write(1, &str[index + i], 1);
-		// write(1, "\n", 1);
 		i++;
 	}
 	index += i;
@@ -156,7 +149,7 @@ char	*build_str(char *storage, char *temp, int ret, int *trigger)
 
 char	*read_line(int fd, char **buff, int	*index)
 {
-	int		ret;
+	unsigned int		ret;
 	char	*temp;
 	int		trigger;
 	char	*storage;
@@ -175,7 +168,7 @@ char	*read_line(int fd, char **buff, int	*index)
 		storage = build_str(storage, temp, ret, &trigger);
 		if (trigger == 1)
 		{
-			*buff = handle_overflow(ret, temp, buff, index);
+			*buff = handle_overflow(ret, temp, index);
 			*index = 0;
 			return (storage);
 		}
@@ -200,7 +193,6 @@ char	*line_from_buff(char **buff, int len)
 	ft_memcpy(temp, *buff + len + 1, size);
 	temp[size + 1] = '\0';
 	free(*buff);
-	// Onko bufferia jäljellä?
 	*buff = malloc(sizeof(char) * (size + 1));
 	ft_memcpy(*buff, temp, size + 1);
 	return (line);
