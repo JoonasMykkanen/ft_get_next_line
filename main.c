@@ -10,11 +10,12 @@
 # define BUFFER_SIZE 100
 #endif
 
-
 size_t	ft_strlen(char const *s)
 {
 	int	i;
 
+	if (!s)
+		return (0);
 	i = 0;
 	while (s[i] != '\0')
 		i++;
@@ -91,18 +92,6 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	return (str);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
 char	*handle_overflow(int ret, char *temp, char **buff, int *index)
 {
 	unsigned int	len;
@@ -114,13 +103,19 @@ char	*handle_overflow(int ret, char *temp, char **buff, int *index)
 		*index += 1;
 		len++;
 	}
+	*index += 1;
 	len = ret - len;
-	printf("overflow len: %d\n", len);
-	storage = malloc(sizeof(char) * (len));
-	if (!storage)
+	// printf("overflow len: %d\n", len);
+	// printf("index: %d\n", *index);
+	storage = malloc(sizeof(char) * (len + 1));
+	if (!storage || len < 1)
+	{
+		free(storage);
 		return (NULL);
-	ft_memcpy(storage, temp + 1, len - 1);
+	}
+	ft_memcpy(storage, temp + *index, len);
 	storage[len + 1] = '\0';
+	// printf("Current overflow buffer: %s ---///\n", storage);
 	return (storage);
 }
 
@@ -143,7 +138,7 @@ char	*build_str(char *storage, char *temp, int ret, int *trigger)
 		{
 			str[index + i + 1] = '\0';
 			*trigger = 1;
-			index = 0;
+			// printf("Line found: %s\n", str);
 			return (str);
 		}
 		// printf("current index: %d str: %c\n", (index + i), str[index + i]);
@@ -177,16 +172,39 @@ char	*read_line(int fd, char **buff, int	*index)
 		if (trigger == 1)
 		{
 			*buff = handle_overflow(ret, temp, buff, index);
+			*index = 0;
 			return (storage);
 		}
 		ret = read(fd, buf, BUFFER_SIZE);
 	}
-	// int	xy = strlen(storage);
-	// write(1, storage, xy);
 	return (storage);
 }
 
+char	*line_from_buff(char **buff, int len)
+{
+	char	*line;
+	char 	*temp;
+	int		size;
 
+	size = ft_strlen(*buff) - len;
+	line = malloc(sizeof(char) * (len + 2));
+	temp = malloc(sizeof(char) * (size + 1));
+	if (!line || !temp)
+		return (NULL);
+	ft_memcpy(line, *buff, len + 1);
+	line[len + 2] = '\0';
+	// fflush(stdout);
+	// printf("Line: %s\n", line);
+	ft_memcpy(temp, *buff + len + 1, size);
+	temp[size + 1] = '\0';
+	// printf("Buff bef: %s\n", *buff);
+	free(*buff);
+	*buff = malloc(sizeof(char) * (size + 1));
+	ft_memcpy(*buff, temp, size + 1);
+	// fflush(stdout);
+	// printf("Buff aft: %s\n", *buff);
+	return (line);
+}
 
 char	*get_next_line(int fd)
 {
@@ -196,23 +214,22 @@ char	*get_next_line(int fd)
 	char		*storage;
 	int			len;
 
+	len = 0;
 	if (buff)
 	{
-		len = (ft_strlen(buff) - index);
-		line = malloc(sizeof(char) * (len + 1));
-		ft_memcpy(line, buff + ++index, len + 1);
-		if (ft_memchr(buff + index, '\n', len))
+		if (ft_memchr(buff, '\n', ft_strlen(buff)))
 		{
-			while(line[index] != '\n')
+			while (buff[len] != '\n')
 			{
-				
-				index++;
+				// write(1, &buff[len], 1);
+				len++;
 			}
+			line = line_from_buff(&buff, len);
 			return (line);
 		}
-		index = 0;
+		line = malloc(sizeof(char) * ft_strlen(buff) + 1);
+		ft_memcpy(line, buff, ft_strlen(buff) + 1);
 		storage = read_line(fd, &buff, &index);
-		printf("line: %s storage: %s\n", line, storage);
 		return (ft_strjoin(line, storage));
 	}
 	else
@@ -233,21 +250,24 @@ int	main()
 	fd = open(file, O_RDONLY);
 
 	line = get_next_line(fd);
+	fflush(stdout);
+	printf("%s", line);
+	line = get_next_line(fd);
+	fflush(stdout);
+	printf("%s", line);
+	line = get_next_line(fd);
+	fflush(stdout);
+	printf("%s", line);
+	line = get_next_line(fd);
+	printf("%s", line);
+	line = get_next_line(fd);
+	printf("%s", line);
+	line = get_next_line(fd);
 	printf("%s", line);
 	line = get_next_line(fd);
 	printf("%s", line);
 	// line = get_next_line(fd);
-	// printf("%s\n", line);
-	// line = get_next_line(fd);
-	// printf("%s\n", line);
-	// line = get_next_line(fd);
-	// printf("%s\n", line);
-	// line = get_next_line(fd);
-	// printf("%s\n", line);
-	// line = get_next_line(fd);
-	// printf("%s\n", line);
-	// line = get_next_line(fd);
-	// printf("%s\n", line);
+	// printf("%s", line);
 	
 	close(fd);
 	return (0);
