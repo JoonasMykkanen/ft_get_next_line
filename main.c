@@ -98,12 +98,15 @@ char	*handle_overflow(int ret, char *temp, char **buff, int *index)
 	char 			*storage;
 
 	len = 0;
-	while (temp[len] != '\n')
+	while (temp[len] != '\n' && len <= ret)
 	{
 		*index += 1;
 		len++;
 	}
+	if (len < 1)
+		return (NULL);
 	*index += 1;
+	len++;
 	len = ret - len;
 	// printf("overflow len: %d\n", len);
 	// printf("index: %d\n", *index);
@@ -139,6 +142,7 @@ char	*build_str(char *storage, char *temp, int ret, int *trigger)
 			str[index + i + 1] = '\0';
 			*trigger = 1;
 			// printf("Line found: %s\n", str);
+			index = 0;
 			return (str);
 		}
 		// printf("current index: %d str: %c\n", (index + i), str[index + i]);
@@ -193,16 +197,12 @@ char	*line_from_buff(char **buff, int len)
 		return (NULL);
 	ft_memcpy(line, *buff, len + 1);
 	line[len + 2] = '\0';
-	// fflush(stdout);
-	// printf("Line: %s\n", line);
 	ft_memcpy(temp, *buff + len + 1, size);
 	temp[size + 1] = '\0';
-	// printf("Buff bef: %s\n", *buff);
 	free(*buff);
+	// Onko bufferia jäljellä?
 	*buff = malloc(sizeof(char) * (size + 1));
 	ft_memcpy(*buff, temp, size + 1);
-	// fflush(stdout);
-	// printf("Buff aft: %s\n", *buff);
 	return (line);
 }
 
@@ -220,16 +220,15 @@ char	*get_next_line(int fd)
 		if (ft_memchr(buff, '\n', ft_strlen(buff)))
 		{
 			while (buff[len] != '\n')
-			{
-				// write(1, &buff[len], 1);
 				len++;
-			}
 			line = line_from_buff(&buff, len);
 			return (line);
 		}
 		line = malloc(sizeof(char) * ft_strlen(buff) + 1);
 		ft_memcpy(line, buff, ft_strlen(buff) + 1);
 		storage = read_line(fd, &buff, &index);
+		if (len == 0 && ft_strlen(storage) == 0)
+			return (NULL);
 		return (ft_strjoin(line, storage));
 	}
 	else
@@ -266,8 +265,10 @@ int	main()
 	printf("%s", line);
 	line = get_next_line(fd);
 	printf("%s", line);
-	// line = get_next_line(fd);
-	// printf("%s", line);
+	line = get_next_line(fd);
+	printf("%s", line);
+	line = get_next_line(fd);
+	printf("%s", line);
 	
 	close(fd);
 	return (0);
