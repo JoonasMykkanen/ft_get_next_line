@@ -7,7 +7,7 @@
 #include <string.h>
 
 #ifndef BUFFER_SIZE
-# define BUFFER_SIZE 15
+# define BUFFER_SIZE 30
 #endif
 
 size_t	ft_strlen(char const *s)
@@ -128,7 +128,10 @@ char	*build_str(char *storage, char *temp,unsigned int ret, int *trigger)
 
 	i = 0;
 	c = temp[i];
+	// LEAKING
 	str = malloc(sizeof(char) * (index + ret + 1));
+	if (!str)
+		return (NULL);
 	ft_memcpy(str, storage, index);
 	while (i < ret)
 	{
@@ -149,11 +152,11 @@ char	*build_str(char *storage, char *temp,unsigned int ret, int *trigger)
 
 char	*read_line(int fd, char **buff, int	*index)
 {
-	unsigned int		ret;
-	char	*temp;
-	int		trigger;
-	char	*storage;
-	char	buf[BUFFER_SIZE];
+	unsigned int	ret;
+	char			*temp;
+	int				trigger;
+	char			*storage;
+	char			buf[BUFFER_SIZE];
 
 	trigger = 0;
 	ret = read(fd, buf, BUFFER_SIZE);
@@ -170,10 +173,12 @@ char	*read_line(int fd, char **buff, int	*index)
 		{
 			*buff = handle_overflow(ret, temp, index);
 			*index = 0;
+			free(temp);
 			return (storage);
 		}
 		ret = read(fd, buf, BUFFER_SIZE);
 	}
+	free(temp);
 	return (storage);
 }
 
@@ -220,7 +225,10 @@ char	*get_next_line(int fd)
 		ft_memcpy(line, buff, ft_strlen(buff) + 1);
 		storage = read_line(fd, &buff, &index);
 		if (len == 0 && ft_strlen(storage) == 0)
+		{
+			free(storage);
 			return (NULL);
+		}
 		return (ft_strjoin(line, storage));
 	}
 	else
@@ -241,26 +249,24 @@ int	main()
 	fd = open(file, O_RDONLY);
 
 	line = get_next_line(fd);
-	fflush(stdout);
 	printf("%s", line);
-	line = get_next_line(fd);
-	fflush(stdout);
-	printf("%s", line);
-	line = get_next_line(fd);
-	fflush(stdout);
-	printf("%s", line);
-	line = get_next_line(fd);
-	printf("%s", line);
-	line = get_next_line(fd);
-	printf("%s", line);
-	line = get_next_line(fd);
-	printf("%s", line);
-	line = get_next_line(fd);
-	printf("%s", line);
-	line = get_next_line(fd);
-	printf("%s", line);
-	line = get_next_line(fd);
-	printf("%s", line);
+	// line = get_next_line(fd);
+	// fflush(stdout);
+	// printf("%s", line);
+	// line = get_next_line(fd);
+	// printf("%s", line);
+	// line = get_next_line(fd);
+	// printf("%s", line);
+	// line = get_next_line(fd);
+	// printf("%s", line);
+	// line = get_next_line(fd);
+	// printf("%s", line);
+	// line = get_next_line(fd);
+	// printf("%s", line);
+	// line = get_next_line(fd);
+	// printf("%s", line);
+	// line = get_next_line(fd);
+	// printf("%s", line);
 	
 	close(fd);
 	return (0);
