@@ -7,7 +7,7 @@
 #include <string.h>
 
 #ifndef BUFFER_SIZE
-# define BUFFER_SIZE 15
+# define BUFFER_SIZE 10
 #endif
 
 size_t	ft_strlen(char const *s)
@@ -103,8 +103,6 @@ char	*handle_overflow(unsigned int ret, char *temp, int *index)
 		*index += 1;
 		len++;
 	}
-	if (len < 1)
-		return (NULL);
 	*index += 1;
 	len++;
 	len = ret - len;
