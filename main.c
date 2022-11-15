@@ -7,7 +7,7 @@
 #include <string.h>
 
 #ifndef BUFFER_SIZE
-# define BUFFER_SIZE 30
+# define BUFFER_SIZE 15
 #endif
 
 size_t	ft_strlen(char const *s)
@@ -88,7 +88,7 @@ char	*ft_strjoin(char const *s1, char const *s2)
 		i++;
 		j++;
 	}
-	str[++i] = '\0';	
+	str[i] = '\0';	
 	return (str);
 }
 
@@ -115,7 +115,7 @@ char	*handle_overflow(unsigned int ret, char *temp, int *index)
 		return (NULL);
 	}
 	ft_memcpy(storage, temp + *index, len);
-	storage[len + 1] = '\0';
+	storage[len] = '\0';
 	return (storage);
 }
 
@@ -229,6 +229,7 @@ char	*get_next_line(int fd)
 			free(storage);
 			return (NULL);
 		}
+		// printf("line = %s storage = %s\n", line, storage);
 		return (ft_strjoin(line, storage));
 	}
 	else
@@ -251,7 +252,6 @@ int	main()
 	line = get_next_line(fd);
 	printf("%s", line);
 	// line = get_next_line(fd);
-	// fflush(stdout);
 	// printf("%s", line);
 	// line = get_next_line(fd);
 	// printf("%s", line);
