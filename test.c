@@ -7,7 +7,7 @@
 #include <string.h>
 
 #ifndef BUFFER_SIZE
-# define BUFFER_SIZE 10
+# define BUFFER_SIZE 50
 #endif
 
 size_t	ft_strlen(char const *s)
@@ -187,9 +187,9 @@ char	*line_from_buff(char **buff, int len)
 	if (!line || !temp)
 		return (NULL);
 	ft_memcpy(line, *buff, len + 1);
-	line[len + 2] = '\0';
+	line[len + 1] = '\0';
 	ft_memcpy(temp, *buff + len + 1, size);
-	temp[size + 1] = '\0';
+	temp[size] = '\0';
 	free(*buff);
 	*buff = malloc(sizeof(char) * (size + 1));
 	ft_memcpy(*buff, temp, size + 1);
