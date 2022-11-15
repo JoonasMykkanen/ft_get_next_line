@@ -147,6 +147,7 @@ void	handle_overflow(char **buff, unsigned int ret, char *temp, int *index)
 		if (!*buff || len < 0)
 		{
 			free(*buff);
+			
 		}
 		ft_memcpy(*buff, temp + *index, len);
 		free(holder);
@@ -193,17 +194,17 @@ char	*read_line(int fd, char **buff, int	*index)
 
 	trigger = 0;
 	ret = read(fd, buf, BUFFER_SIZE);
-	storage = malloc(sizeof(char) * 0);
 	if (!ret)
 		return (NULL);
 	while (ret)
 	{
-		if (storage)
-		{
-			temp = malloc(sizeof(char) * (ft_strlen(storage) + 1));
-			ft_memcpy(temp, storage,(ft_strlen(storage) + 1));
-			free(storage);
-		}
+		// if (storage)
+		// {
+		// 	temp = malloc(sizeof(char) * (ft_strlen(storage) + 1));
+		// 	ft_memcpy(temp, storage,(ft_strlen(storage) + 1));
+		// 	free(storage);
+		// }
+		// storage = "";
 		storage = build_str(temp, buf, ret, &trigger);
 		free(temp);
 		if (trigger == 1)

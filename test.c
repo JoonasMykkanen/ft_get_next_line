@@ -7,7 +7,7 @@
 #include <string.h>
 
 #ifndef BUFFER_SIZE
-# define BUFFER_SIZE 50
+# define BUFFER_SIZE 100
 #endif
 
 size_t	ft_strlen(char const *s)
