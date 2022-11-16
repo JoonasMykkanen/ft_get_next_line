@@ -209,6 +209,7 @@ char	*line_from_buff(char **buff, int len)
 	free(*buff);
 	*buff = malloc(sizeof(char) * (size + 1));
 	ft_memcpy(*buff, temp, size + 1);
+	free(temp);
 	return (line);
 }
 
@@ -266,13 +267,11 @@ int	main()
 	line = get_next_line(fd);
 	printf("%s", line);
 	free(line);
-	fflush(stdout);
 	while (line != NULL)
 	{
 		line = get_next_line(fd);
 		printf("%s", line);
 		free(line);
-		fflush(stdout);
 	}
 	
 	close(fd);
