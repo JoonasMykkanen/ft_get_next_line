@@ -7,14 +7,14 @@
 #include <string.h>
 
 #ifndef BUFFER_SIZE
-# define BUFFER_SIZE 30
+# define BUFFER_SIZE 555
 #endif
 
 size_t	ft_strlen(char const *s)
 {
 	int	i;
 
-	if (!s)
+	if (!s || s == NULL)
 		return (0);
 	i = 0;
 	while (s[i] != '\0')
@@ -92,6 +92,13 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	return (str);
 }
 
+
+
+
+
+
+
+
 char	*handle_overflow(unsigned int ret, char *temp, int *index)
 {
 	unsigned int	len;
@@ -127,7 +134,10 @@ char	*build_str(char *storage, char *temp,unsigned int ret, int *trigger)
 	i = 0;
 	c = temp[i];
 	str = malloc(sizeof(char) * (index + ret + 1));
-	ft_memcpy(str, storage, index);
+	if (!str)
+		return(NULL);
+	if (storage)
+		ft_memcpy(str, storage, index);
 	while (i < ret)
 	{
 		c = temp[i];
@@ -154,19 +164,25 @@ char	*read_line(int fd, char **buff, int	*index)
 	char	buf[BUFFER_SIZE];
 
 	trigger = 0;
+	storage = NULL;
 	ret = read(fd, buf, BUFFER_SIZE);
 	if (!ret)
 		return (NULL);
-	temp = malloc(sizeof(char) * ret);
-	if (!temp)
-		return (NULL);
 	while (ret)
 	{
-		ft_memcpy(temp, buf, ret);
-		storage = build_str(storage, temp, ret, &trigger);
+		temp = malloc(sizeof(char) * ft_strlen(storage) + 1);
+		if (ft_strlen(storage) != 0)
+		{
+			ft_memcpy(temp, storage, ft_strlen(storage));			
+			temp[ft_strlen(storage) + 1] = '\0';
+			free(storage);
+		}
+		storage = build_str(temp, buf, ret, &trigger);
+		free(temp);
 		if (trigger == 1)
 		{
-			*buff = handle_overflow(ret, temp, index);
+			*buff = handle_overflow(ret, buf, index);
+			// handle_overflow(buff, ret, temp, index);
 			*index = 0;
 			return (storage);
 		}
@@ -196,12 +212,15 @@ char	*line_from_buff(char **buff, int len)
 	return (line);
 }
 
+
+
 char	*get_next_line(int fd)
 {
 	static char	*buff;
 	static int	index;
 	char		*line;
 	char		*storage;
+	char		*temp;
 	int			len;
 
 	len = 0;
@@ -218,8 +237,16 @@ char	*get_next_line(int fd)
 		ft_memcpy(line, buff, ft_strlen(buff) + 1);
 		storage = read_line(fd, &buff, &index);
 		if (len == 0 && ft_strlen(storage) == 0)
+		{
+			free(line);
+			free(storage);
 			return (NULL);
-		return (ft_strjoin(line, storage));
+		}
+		// printf("-----line = %s storage = %s-----\n", line, storage);
+		temp = ft_strjoin(line, storage);
+		free(line);
+		free(storage);
+		return (temp);
 	}
 	else
 		storage = read_line(fd, &buff, &index);
@@ -232,36 +259,21 @@ int	main()
 	int		fd;
 	char	*file;
 	char 	*line;
-	
+
 	file = "files/file.txt";
 	fd = open(file, O_RDONLY);
 
 	line = get_next_line(fd);
 	printf("%s", line);
 	free(line);
+	fflush(stdout);
 	while (line != NULL)
 	{
 		line = get_next_line(fd);
 		printf("%s", line);
 		free(line);
+		fflush(stdout);
 	}
-
-	// line = get_next_line(fd);
-	// printf("%s", line);
-	// line = get_next_line(fd);
-	// printf("%s", line);
-	// line = get_next_line(fd);
-	// printf("%s", line);
-	// line = get_next_line(fd);
-	// printf("%s", line);
-	// line = get_next_line(fd);
-	// printf("%s", line);
-	// line = get_next_line(fd);
-	// printf("%s", line);
-	// line = get_next_line(fd);
-	// printf("%s", line);
-	// line = get_next_line(fd);
-	// printf("%s", line);
 	
 	close(fd);
 	return (0);
