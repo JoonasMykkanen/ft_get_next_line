@@ -7,7 +7,7 @@
 #include <string.h>
 
 #ifndef BUFFER_SIZE
-# define BUFFER_SIZE 50
+# define BUFFER_SIZE 15
 #endif
 
 size_t	ft_strlen(char const *s)
@@ -92,13 +92,6 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	return (str);
 }
 
-
-
-
-
-
-
-
 // char	*handle_overflow(unsigned int ret, char *temp, int *index)
 // {
 // 	unsigned int	len;
@@ -145,6 +138,7 @@ void	handle_overflow(char **buff, unsigned int ret, char *temp, int *index)
 	*buff = malloc(sizeof(char) * (len + 1));
 	if (!*buff || len < 1)
 	{
+		free(storage);
 		return ;
 	}
 	ft_memcpy(*buff, storage, len + 1);
@@ -279,7 +273,6 @@ char	*get_next_line(int fd)
 	return (storage);
 }
 
-
 int	main()
 {
 	int		fd;
@@ -298,7 +291,6 @@ int	main()
 		printf("%s", line);
 		free(line);
 	}
-	
 	close(fd);
 	return (0);
 }
