@@ -166,13 +166,14 @@ char	*build_str(char *storage, char *temp,unsigned int ret, int *trigger)
 		str[index + i] = c;
 		if (c == '\n')
 		{
-			str[index + i + 1] = '\0'; //trying with +1 and without (og with)
+			str[index + i + 1] = '\0';
 			*trigger = 1;
 			index = 0;
 			return (str);
 		}
 		i++;
 	}
+	str[index + i + 1] = '\0';
 	index += i;
 	return (str);
 }
@@ -248,7 +249,7 @@ char	*get_next_line(int fd)
 	len = 0;
 	if (buff)
 	{
-		if (ft_memchr(buff, '\n', ft_strlen(buff)))
+		if (ft_memchr(buff, '\n', strlen(buff))) //this is prolly causing strlen to overflow atm
 		{
 			while (buff[len] != '\n')
 				len++;
