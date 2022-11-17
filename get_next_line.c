@@ -2,7 +2,7 @@
 #include "get_next_line.h"
 
 
-void	handle_overflow(char **buff, unsigned int ret, char *temp, int *index)
+static void	handle_overflow(char **buff, unsigned int ret, char *temp, int *index)
 {
 	unsigned int	len;
 	char 			*storage;
@@ -33,7 +33,7 @@ void	handle_overflow(char **buff, unsigned int ret, char *temp, int *index)
 	free(storage);
 }
 
-char	*build_str(char *storage, char *temp, unsigned int ret, int *trigger)
+static char	*build_str(char *storage, char *temp, unsigned int ret, int *trigger)
 {
 	static int	index = 0;
 	char		*str;
@@ -65,9 +65,9 @@ char	*build_str(char *storage, char *temp, unsigned int ret, int *trigger)
 	return (str);
 }
 
-char	*read_line(int fd, char **buff, int	*index)
+static char	*read_line(int fd, char **buff, int	*index)
 {
-	unsigned int		ret;
+	int		ret;
 	char	*temp;
 	int		trigger;
 	char	*storage;
@@ -76,7 +76,7 @@ char	*read_line(int fd, char **buff, int	*index)
 	trigger = 0;
 	storage = NULL;
 	ret = read(fd, buf, BUFFER_SIZE);
-	if (!ret)
+	if (ret == -1)
 		return (NULL);
 	while (ret)
 	{
@@ -102,7 +102,7 @@ char	*read_line(int fd, char **buff, int	*index)
 	return (storage);
 }
 
-char	*line_from_buff(char **buff, int len)
+static char	*line_from_buff(char **buff, int len)
 {
 	char	*line;
 	char 	*temp;

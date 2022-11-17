@@ -5,13 +5,13 @@
 
 
 #ifndef BUFFER_SIZE
-# define BUFFER_SIZE 15
+# define BUFFER_SIZE 30
 #endif
 
-# include <stdlib.h>
-# include <sys/uio.h>
-# include <sys/types.h>
-# include <string.h>
+#include <stdlib.h>
+#include <sys/uio.h>
+#include <sys/types.h>
+#include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <stdio.h>
