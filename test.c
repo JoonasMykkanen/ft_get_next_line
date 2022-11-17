@@ -3,13 +3,14 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <stdio.h>
-#include "get_next_line.h"
 #include <string.h>
+#include <stdlib.h>
 
 #ifndef BUFFER_SIZE
 # define BUFFER_SIZE 1
 #endif
 
+size_t	ft_strlen(char const *s);
 
 void	*ft_memcpy(void *dst, const void *src, size_t n)
 {
@@ -133,20 +134,22 @@ void	handle_overflow(char **buff, unsigned int ret, char *temp, int *index)
 	*index += 1;
 	len++;
 	len = ret - len;
-	storage = malloc(sizeof(char) * (len));
+	if (len == 0)
+		return ;
+	storage = malloc(sizeof(char) * (len + 1));
 	ft_memcpy(storage, temp + *index, len);
 	storage[len] = '\0';
-	*buff = malloc(sizeof(char) * (len + 1));
+	*buff = malloc(sizeof(char) * (len));
 	if (!*buff || len < 1)
 	{
 		free(storage);
 		return ;
 	}
-	ft_memcpy(*buff, storage, len + 1);
+	ft_memcpy(*buff, storage, len);
 	free(storage);
 }
 
-char	*build_str(char *storage, char *temp,unsigned int ret, int *trigger)
+char	*build_str(char *storage, char *temp, unsigned int ret, int *trigger)
 {
 	static int	index = 0;
 	char		*str;
@@ -155,7 +158,7 @@ char	*build_str(char *storage, char *temp,unsigned int ret, int *trigger)
 
 	i = 0;
 	c = temp[i];
-	str = malloc(sizeof(char) * (index + ret + 1));
+	str = malloc(sizeof(char) * (index + ret + 2));
 	if (!str)
 		return(NULL);
 	if (storage)
@@ -193,7 +196,7 @@ char	*read_line(int fd, char **buff, int	*index)
 		return (NULL);
 	while (ret)
 	{
-		temp = malloc(sizeof(char) * ft_strlen(storage) + 1);
+		temp = malloc(sizeof(char) * ft_strlen(storage) + 2);
 		if (ft_strlen(storage) != 0)
 		{
 			ft_memcpy(temp, storage, ft_strlen(storage));			
@@ -249,7 +252,7 @@ char	*get_next_line(int fd)
 	len = 0;
 	if (buff)
 	{
-		if (ft_memchr(buff, '\n', strlen(buff))) //this is prolly causing strlen to overflow atm
+		if (ft_memchr(buff, '\n', ft_strlen(buff))) //this is prolly causing strlen to overflow atm
 		{
 			while (buff[len] != '\n')
 				len++;
