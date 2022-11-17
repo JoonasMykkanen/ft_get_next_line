@@ -1,39 +1,35 @@
-#include <sys/types.h>
-#include <sys/uio.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <stdio.h>
+
 #include "get_next_line.h"
-#include <string.h>
 
-
-
-#ifndef BUFFER_SIZE
-# define BUFFER_SIZE 15
-#endif
-
-
-
-void	*ft_memcpy(void *dst, const void *src, size_t n)
+void	handle_overflow(char **buff, unsigned int ret, char *temp, int *index)
 {
-	size_t			i;
-	unsigned char	*d;
-	unsigned char	*s;
+	unsigned int	len;
+	char 			*storage;
 
-	d = (unsigned char *)dst;
-	s = (unsigned char *)src;
-	i = 0;
-	if (d == NULL && s == NULL)
-		return (d);
-	while (i < n)
+	len = 0;
+	free(*buff);
+	while (temp[len] != '\n' && len <= ret)
 	{
-		d[i] = s[i];
-		i++;
+		*index += 1;
+		len++;
 	}
-	return (dst);
+	*index += 1;
+	len++;
+	len = ret - len;
+	storage = malloc(sizeof(char) * (len + 1));
+	ft_memcpy(storage, temp + *index, len);
+	storage[len + 1] = '\0';
+	*buff = malloc(sizeof(char) * (len + 1));
+	if (!*buff || len < 1)
+	{
+		free(storage);
+		return ;
+	}
+	ft_memcpy(*buff, storage, len + 1);
+	free(storage);
 }
 
-char	*build_str(char *storage, char *temp, int ret, int *trigger)
+char	*build_str(char *storage, char *temp,unsigned int ret, int *trigger)
 {
 	static int	index = 0;
 	char		*str;
@@ -43,64 +39,121 @@ char	*build_str(char *storage, char *temp, int ret, int *trigger)
 	i = 0;
 	c = temp[i];
 	str = malloc(sizeof(char) * (index + ret + 1));
-	ft_memcpy(str, storage, index);
-	while (c != '\n' && i < ret)
+	if (!str)
+		return(NULL);
+	if (storage)
+		ft_memcpy(str, storage, index);
+	while ((unsigned int)i < ret)
 	{
 		c = temp[i];
 		str[index + i] = c;
 		if (c == '\n')
 		{
-			str[index + i + 1] = '\0'; 
+			str[index + i + 1] = '\0'; //trying with +1 and without (og with)
 			*trigger = 1;
 			index = 0;
 			return (str);
 		}
-		// printf("current index: %d str: %c\n", (index + i), str[index + i]);
-		// write(1, &str[index + i], 1);
-		// write(1, "\n", 1);
 		i++;
 	}
 	index += i;
 	return (str);
 }
 
-char	*read_line(int fd)
+char	*read_line(int fd, char **buff, int	*index)
 {
-	int		ret;
+	unsigned int		ret;
 	char	*temp;
 	int		trigger;
 	char	*storage;
 	char	buf[BUFFER_SIZE];
 
 	trigger = 0;
+	storage = NULL;
 	ret = read(fd, buf, BUFFER_SIZE);
 	if (!ret)
 		return (NULL);
-	temp = malloc(sizeof(char) * ret);
-	if (!temp)
-		return (NULL);
 	while (ret)
 	{
-		ft_memcpy(temp, buf, ret);
-		storage = build_str(storage, temp, ret, &trigger);
+		temp = malloc(sizeof(char) * ft_strlen(storage) + 1);
+		if (ft_strlen(storage) != 0)
+		{
+			ft_memcpy(temp, storage, ft_strlen(storage));			
+			temp[ft_strlen(storage) + 1] = '\0';
+			free(storage);
+			storage = NULL; //might not be needed
+		}
+		storage = build_str(temp, buf, ret, &trigger);
+		free(temp);
 		if (trigger == 1)
 		{
-			// handle_overflow();
-			break ;
+			// *buff = handle_overflow(ret, buf, index);
+			handle_overflow(buff, ret, buf, index);
+			*index = 0;
+			return (storage);
 		}
 		ret = read(fd, buf, BUFFER_SIZE);
 	}
-	// int	xy = strlen(storage);
-	// write(1, storage, xy);
 	return (storage);
+}
+
+char	*line_from_buff(char **buff, int len)
+{
+	char	*line;
+	char 	*temp;
+	int		size;
+
+	size = ft_strlen(*buff) - len;
+	line = malloc(sizeof(char) * (len + 2));
+	temp = malloc(sizeof(char) * (size + 1));
+	if (!line || !temp)
+		return (NULL);
+	ft_memcpy(line, *buff, len + 1);
+	line[len + 1] = '\0';
+	ft_memcpy(temp, *buff + len + 1, size);
+	temp[size] = '\0';
+	free(*buff);
+	*buff = malloc(sizeof(char) * (size + 1));
+	ft_memcpy(*buff, temp, size + 1);
+	free(temp);
+	return (line);
 }
 
 char	*get_next_line(int fd)
 {
-	// static char	*buff;
+	static char	*buff;
+	static int	index;
 	char		*line;
+	char		*storage;
+	char		*temp;
+	int			len;
 
-	line = read_line(fd);
-	// buff = overflow read bufferista
-	return (line);
+	len = 0;
+	if (buff)
+	{
+		if (ft_memchr(buff, '\n', ft_strlen(buff)))
+		{
+			while (buff[len] != '\n')
+				len++;
+			line = line_from_buff(&buff, len);
+			return (line);
+		}
+		line = malloc(sizeof(char) * ft_strlen(buff) + 1);
+		ft_memcpy(line, buff, ft_strlen(buff) + 1);
+		storage = read_line(fd, &buff, &index);
+		if (len == 0 && ft_strlen(storage) == 0)
+		{
+			free(line);
+			free(storage);
+			return (NULL);
+		}
+		// printf("-----line = %s storage = %s-----\n", line, storage);
+		temp = ft_strjoin(line, storage);
+		free(line);
+		free(storage);
+		return (temp);
+	}
+	else
+		storage = read_line(fd, &buff, &index);
+	return (storage);
 }

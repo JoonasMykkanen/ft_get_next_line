@@ -7,20 +7,9 @@
 #include <string.h>
 
 #ifndef BUFFER_SIZE
-# define BUFFER_SIZE 15
+# define BUFFER_SIZE 1
 #endif
 
-size_t	ft_strlen(char const *s)
-{
-	int	i;
-
-	if (s == NULL || !s)
-		return (0);
-	i = 0;
-	while (s[i] != '\0')
-		i++;
-	return (i);
-}
 
 void	*ft_memcpy(void *dst, const void *src, size_t n)
 {
@@ -92,30 +81,42 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	return (str);
 }
 
-// char	*handle_overflow(unsigned int ret, char *temp, int *index)
-// {
-// 	unsigned int	len;
-// 	char 			*storage;
+int	ft_strncmp(const char *s1, const char *s2, size_t n)
+{
+	int				i;
+	unsigned char	*str1;
+	unsigned char	*str2;
 
-// 	len = 0;
-// 	while (temp[len] != '\n' && len <= ret)
-// 	{
-// 		*index += 1;
-// 		len++;
-// 	}
-// 	*index += 1;
-// 	len++;
-// 	len = ret - len;
-// 	storage = malloc(sizeof(char) * (len + 1));
-// 	if (!storage || len < 1)
-// 	{
-// 		free(storage);
-// 		return (NULL);
-// 	}
-// 	ft_memcpy(storage, temp + *index, len);
-// 	storage[len] = '\0';
-// 	return (storage);
-// }
+	i = 0;
+	str1 = (unsigned char *)s1;
+	str2 = (unsigned char *)s2;
+	while (n > 0 && str1[i] != '\0' && str1[i] == str2[i])
+	{
+		n--;
+		i++;
+	}
+	if (n == 0)
+		return (0);
+	return (str1[i] - str2[i]);
+}
+
+size_t	ft_strlen(char const *s)
+{
+	int	i;
+
+	i = 0;
+	if (s == NULL || !s)
+	{
+		return (0);
+	}
+	if (ft_strncmp(s, "", 1) == 0)
+	{
+		return (0);
+	}
+	while (s[i] != '\0')
+		i++;
+	return (i);
+}
 
 void	handle_overflow(char **buff, unsigned int ret, char *temp, int *index)
 {
@@ -132,9 +133,9 @@ void	handle_overflow(char **buff, unsigned int ret, char *temp, int *index)
 	*index += 1;
 	len++;
 	len = ret - len;
-	storage = malloc(sizeof(char) * (len + 1));
+	storage = malloc(sizeof(char) * (len));
 	ft_memcpy(storage, temp + *index, len);
-	storage[len + 1] = '\0';
+	storage[len] = '\0';
 	*buff = malloc(sizeof(char) * (len + 1));
 	if (!*buff || len < 1)
 	{
@@ -159,13 +160,13 @@ char	*build_str(char *storage, char *temp,unsigned int ret, int *trigger)
 		return(NULL);
 	if (storage)
 		ft_memcpy(str, storage, index);
-	while (i < ret)
+	while ((unsigned int)i < ret)
 	{
 		c = temp[i];
 		str[index + i] = c;
 		if (c == '\n')
 		{
-			str[index + i + 1] = '\0';
+			str[index + i + 1] = '\0'; //trying with +1 and without (og with)
 			*trigger = 1;
 			index = 0;
 			return (str);
@@ -197,6 +198,7 @@ char	*read_line(int fd, char **buff, int	*index)
 			ft_memcpy(temp, storage, ft_strlen(storage));			
 			temp[ft_strlen(storage) + 1] = '\0';
 			free(storage);
+			storage = NULL; //might not be needed
 		}
 		storage = build_str(temp, buf, ret, &trigger);
 		free(temp);
