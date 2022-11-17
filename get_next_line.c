@@ -1,6 +1,7 @@
 
 #include "get_next_line.h"
 
+
 void	handle_overflow(char **buff, unsigned int ret, char *temp, int *index)
 {
 	unsigned int	len;
@@ -8,6 +9,7 @@ void	handle_overflow(char **buff, unsigned int ret, char *temp, int *index)
 
 	len = 0;
 	free(*buff);
+	*buff = NULL;
 	while (temp[len] != '\n' && len <= ret)
 	{
 		*index += 1;
@@ -16,9 +18,11 @@ void	handle_overflow(char **buff, unsigned int ret, char *temp, int *index)
 	*index += 1;
 	len++;
 	len = ret - len;
+	if (len == 0)
+		return ;
 	storage = malloc(sizeof(char) * (len + 1));
 	ft_memcpy(storage, temp + *index, len);
-	storage[len + 1] = '\0';
+	storage[len] = '\0';
 	*buff = malloc(sizeof(char) * (len + 1));
 	if (!*buff || len < 1)
 	{
@@ -29,7 +33,7 @@ void	handle_overflow(char **buff, unsigned int ret, char *temp, int *index)
 	free(storage);
 }
 
-char	*build_str(char *storage, char *temp,unsigned int ret, int *trigger)
+char	*build_str(char *storage, char *temp, unsigned int ret, int *trigger)
 {
 	static int	index = 0;
 	char		*str;
@@ -38,7 +42,7 @@ char	*build_str(char *storage, char *temp,unsigned int ret, int *trigger)
 
 	i = 0;
 	c = temp[i];
-	str = malloc(sizeof(char) * (index + ret + 1));
+	str = malloc(sizeof(char) * (index + ret + 2));
 	if (!str)
 		return(NULL);
 	if (storage)
@@ -49,13 +53,14 @@ char	*build_str(char *storage, char *temp,unsigned int ret, int *trigger)
 		str[index + i] = c;
 		if (c == '\n')
 		{
-			str[index + i + 1] = '\0'; //trying with +1 and without (og with)
+			str[index + i + 1] = '\0';
 			*trigger = 1;
 			index = 0;
 			return (str);
 		}
 		i++;
 	}
+	str[index + i + 1] = '\0';
 	index += i;
 	return (str);
 }
@@ -75,7 +80,7 @@ char	*read_line(int fd, char **buff, int	*index)
 		return (NULL);
 	while (ret)
 	{
-		temp = malloc(sizeof(char) * ft_strlen(storage) + 1);
+		temp = malloc(sizeof(char) * ft_strlen(storage) + 2);
 		if (ft_strlen(storage) != 0)
 		{
 			ft_memcpy(temp, storage, ft_strlen(storage));			
@@ -131,7 +136,7 @@ char	*get_next_line(int fd)
 	len = 0;
 	if (buff)
 	{
-		if (ft_memchr(buff, '\n', ft_strlen(buff)))
+		if (ft_memchr(buff, '\n', ft_strlen(buff))) //this is prolly causing strlen to overflow atm
 		{
 			while (buff[len] != '\n')
 				len++;
