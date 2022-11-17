@@ -2,7 +2,7 @@
 #include "get_next_line.h"
 
 
-static void	handle_overflow(char **buff, unsigned int ret, char *temp, int *index)
+void	handle_overflow(char **buff, unsigned int ret, char *temp, int *index)
 {
 	unsigned int	len;
 	char 			*storage;
@@ -33,12 +33,12 @@ static void	handle_overflow(char **buff, unsigned int ret, char *temp, int *inde
 	free(storage);
 }
 
-static char	*build_str(char *storage, char *temp, unsigned int ret, int *trigger)
+char	*build_str(char *storage, char *temp, unsigned int ret, int *trigger)
 {
-	static int	index = 0;
-	char		*str;
-	char		c;
-	int			i;
+	static int		index = 0;
+	char			*str;
+	char			c;
+	unsigned int	i;
 
 	i = 0;
 	c = temp[i];
@@ -47,7 +47,7 @@ static char	*build_str(char *storage, char *temp, unsigned int ret, int *trigger
 		return(NULL);
 	if (storage)
 		ft_memcpy(str, storage, index);
-	while ((unsigned int)i < ret)
+	while (i < ret)
 	{
 		c = temp[i];
 		str[index + i] = c;
@@ -65,7 +65,7 @@ static char	*build_str(char *storage, char *temp, unsigned int ret, int *trigger
 	return (str);
 }
 
-static char	*read_line(int fd, char **buff, int	*index)
+char	*read_line(int fd, char **buff, int	*index)
 {
 	int		ret;
 	char	*temp;
@@ -80,7 +80,7 @@ static char	*read_line(int fd, char **buff, int	*index)
 		return (NULL);
 	while (ret)
 	{
-		temp = malloc(sizeof(char) * ft_strlen(storage) + 2);
+		temp = malloc(sizeof(char) * ft_strlen(storage) + 2); //prob fix
 		if (ft_strlen(storage) != 0)
 		{
 			ft_memcpy(temp, storage, ft_strlen(storage));			
@@ -102,14 +102,15 @@ static char	*read_line(int fd, char **buff, int	*index)
 	return (storage);
 }
 
-static char	*line_from_buff(char **buff, int len)
+char	*line_from_buff(char **buff, int len)
 {
 	char	*line;
 	char 	*temp;
 	int		size;
 
 	size = ft_strlen(*buff) - len;
-	line = malloc(sizeof(char) * (len + 2));
+	// if statement can cause segfault
+	line = malloc(sizeof(char) * (len + 1));
 	temp = malloc(sizeof(char) * (size + 1));
 	if (!line || !temp)
 		return (NULL);

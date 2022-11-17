@@ -7,7 +7,7 @@
 #include <stdlib.h>
 
 #ifndef BUFFER_SIZE
-# define BUFFER_SIZE 10
+# define BUFFER_SIZE 42
 #endif
 
 size_t	ft_strlen(char const *s);
@@ -152,10 +152,10 @@ void	handle_overflow(char **buff, unsigned int ret, char *temp, int *index)
 
 char	*build_str(char *storage, char *temp, unsigned int ret, int *trigger)
 {
-	static int	index = 0;
-	char		*str;
-	char		c;
-	int			i;
+	static int		index = 0;
+	char			*str;
+	char			c;
+	unsigned int	i;	
 
 	i = 0;
 	c = temp[i];
@@ -164,7 +164,7 @@ char	*build_str(char *storage, char *temp, unsigned int ret, int *trigger)
 		return(NULL);
 	if (storage)
 		ft_memcpy(str, storage, index);
-	while ((unsigned int)i < ret)
+	while (i < ret)
 	{
 		c = temp[i];
 		str[index + i] = c;
@@ -184,7 +184,7 @@ char	*build_str(char *storage, char *temp, unsigned int ret, int *trigger)
 
 char	*read_line(int fd, char **buff, int	*index)
 {
-	unsigned int		ret;
+	int		ret;
 	char	*temp;
 	int		trigger;
 	char	*storage;
@@ -197,7 +197,7 @@ char	*read_line(int fd, char **buff, int	*index)
 		return (NULL);
 	while (ret)
 	{
-		temp = malloc(sizeof(char) * ft_strlen(storage) + 2);
+		temp = malloc(sizeof(char) * ft_strlen(storage) + 2); //prob fix
 		if (ft_strlen(storage) != 0)
 		{
 			ft_memcpy(temp, storage, ft_strlen(storage));			
@@ -226,7 +226,8 @@ char	*line_from_buff(char **buff, int len)
 	int		size;
 
 	size = ft_strlen(*buff) - len;
-	line = malloc(sizeof(char) * (len + 2));
+	// if statement can cause segfault
+	line = malloc(sizeof(char) * (len + 1));
 	temp = malloc(sizeof(char) * (size + 1));
 	if (!line || !temp)
 		return (NULL);
@@ -286,22 +287,18 @@ int	main()
 	char	*file;
 	char 	*line;
 
-	file = "files/file.txt";
-	// fd = open(file, O_RDONLY);
-
-
-	fd = 42;
-
+	file = "files/big_line_no_nl";
+	fd = open(file, O_RDONLY);
 
 	line = get_next_line(fd);
 	printf("%s", line);
 	free(line);
-	while (line != NULL)
-	{
-		line = get_next_line(fd);
-		printf("%s", line);
-		free(line);
-	}
+	// while (line != NULL)
+	// {
+	// 	line = get_next_line(fd);
+	// 	printf("%s", line);
+	// 	free(line);
+	// }
 	close(fd);
 	return (0);
 }
