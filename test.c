@@ -193,7 +193,7 @@ char	*read_line(int fd, char **buff, int	*index)
 	trigger = 0;
 	storage = NULL;
 	ret = read(fd, buf, BUFFER_SIZE);
-	if (!ret)
+	if (ret == -1)
 		return (NULL);
 	while (ret)
 	{
@@ -287,7 +287,11 @@ int	main()
 	char 	*line;
 
 	file = "files/file.txt";
-	fd = open(file, O_RDONLY);
+	// fd = open(file, O_RDONLY);
+
+
+	fd = 42;
+
 
 	line = get_next_line(fd);
 	printf("%s", line);
