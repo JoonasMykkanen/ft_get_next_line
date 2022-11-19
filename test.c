@@ -118,15 +118,13 @@ size_t	ft_strlen(char const *s)
 		i++;
 	return (i);
 }
-
 void	handle_overflow(char **buff, unsigned int ret, char *temp, int *index)
 {
 	unsigned int	len;
 	char 			*storage;
 
 	len = 0;
-	if (*buff)
-		free(*buff);
+	free(*buff);
 	*buff = NULL;
 	while (temp[len] != '\n' && len <= ret)
 	{
@@ -216,11 +214,6 @@ char	*read_line(int fd, char **buff, int	*index)
 		}
 		ret = read(fd, buf, BUFFER_SIZE);
 	}
-	if (!ret && ft_strlen(storage) == 0)
-	{
-		free(storage);
-		return (NULL);
-	}
 	return (storage);
 }
 
@@ -232,7 +225,7 @@ char	*line_from_buff(char **buff, int len)
 
 	size = ft_strlen(*buff) - len;
 	// if statement can cause segfault
-	line = malloc(sizeof(char) * (len + 1));
+	line = malloc(sizeof(char) * (len + 2));
 	temp = malloc(sizeof(char) * (size + 1));
 	if (!line || !temp)
 		return (NULL);
@@ -267,6 +260,7 @@ char	*get_next_line(int fd)
 			return (line);
 		}
 		len = ft_strlen(buff);
+		// ft_memcpy(line, buff, ft_strlen(buff) + 1);
 		line = line_from_buff(&buff, len);
 		storage = read_line(fd, &buff, &index);
 		if (storage == NULL && ft_strlen(line) < 1)
@@ -285,13 +279,14 @@ char	*get_next_line(int fd)
 	return (storage);
 }
 
+
 int	main()
 {
 	int		fd;
 	char	*file;
 	char 	*line;
 
-	file = "files/41_with_nl";
+	file = "files/bible";
 	fd = open(file, O_RDONLY);
 
 	line = get_next_line(fd);

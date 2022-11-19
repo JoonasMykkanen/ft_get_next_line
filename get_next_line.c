@@ -109,7 +109,7 @@ char	*line_from_buff(char **buff, int len)
 
 	size = ft_strlen(*buff) - len;
 	// if statement can cause segfault
-	line = malloc(sizeof(char) * (len + 1));
+	line = malloc(sizeof(char) * (len + 2));
 	temp = malloc(sizeof(char) * (size + 1));
 	if (!line || !temp)
 		return (NULL);
