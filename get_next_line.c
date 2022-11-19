@@ -1,35 +1,34 @@
 
 #include "get_next_line.h"
 
-
-void	handle_overflow(char **buff, unsigned int ret, char *temp, int *index)
+void	handle_overflow(unsigned int ret, char *temp)
 {
 	unsigned int	len;
 	char 			*storage;
 
 	len = 0;
-	free(*buff);
-	*buff = NULL;
+	free(s.buff);
+	s.buff = NULL;
 	while (temp[len] != '\n' && len <= ret)
 	{
-		*index += 1;
+		s.index += 1;
 		len++;
 	}
-	*index += 1;
+	s.index += 1;
 	len++;
 	len = ret - len;
 	if (len == 0)
 		return ;
 	storage = malloc(sizeof(char) * (len + 1));
-	ft_memcpy(storage, temp + *index, len);
+	ft_memcpy(storage, temp + s.index, len);
 	storage[len] = '\0';
-	*buff = malloc(sizeof(char) * (len + 1));
-	if (!*buff || len < 1)
+	s.buff = malloc(sizeof(char) * (len + 1));
+	if (!s.buff || len < 1)
 	{
 		free(storage);
 		return ;
 	}
-	ft_memcpy(*buff, storage, len + 1);
+	ft_memcpy(s.buff, storage, len + 1);
 	free(storage);
 }
 
@@ -65,7 +64,7 @@ char	*build_str(char *storage, char *temp, unsigned int ret, int *trigger)
 	return (str);
 }
 
-char	*read_line(int fd, char **buff, int	*index)
+char	*read_line(int fd)
 {
 	int		ret;
 	char	*temp;
@@ -92,8 +91,8 @@ char	*read_line(int fd, char **buff, int	*index)
 		free(temp);
 		if (trigger == 1)
 		{
-			handle_overflow(buff, ret, buf, index);
-			*index = 0;
+			handle_overflow(ret, buf);
+			s.index = 0;
 			return (storage);
 		}
 		ret = read(fd, buf, BUFFER_SIZE);
@@ -101,52 +100,50 @@ char	*read_line(int fd, char **buff, int	*index)
 	return (storage);
 }
 
-char	*line_from_buff(char **buff, int len)
+char	*line_from_buff(int len)
 {
 	char	*line;
 	char 	*temp;
 	int		size;
 
-	size = ft_strlen(*buff) - len;
+	size = ft_strlen(s.buff) - len;
 	// if statement can cause segfault
 	line = malloc(sizeof(char) * (len + 2));
 	temp = malloc(sizeof(char) * (size + 1));
 	if (!line || !temp)
 		return (NULL);
-	ft_memcpy(line, *buff, len + 1);
+	ft_memcpy(line, s.buff, len + 1);
 	line[len + 1] = '\0';
-	ft_memcpy(temp, *buff + len + 1, size);
+	ft_memcpy(temp, s.buff + len + 1, size);
 	temp[size] = '\0';
-	free(*buff);
-	*buff = malloc(sizeof(char) * (size + 1));
-	ft_memcpy(*buff, temp, size + 1);
+	free(s.buff);
+	s.buff = malloc(sizeof(char) * (size + 1));
+	ft_memcpy(s.buff, temp, size + 1);
 	free(temp);
 	return (line);
 }
 
 char	*get_next_line(int fd)
 {
-	static char	*buff;
-	static int	index;
 	char		*line;
 	char		*storage;
 	char		*temp;
 	int			len;
 
 	len = 0;
-	if (buff)
+	if (s.buff)
 	{
-		if (ft_memchr(buff, '\n', ft_strlen(buff)))
+		if (ft_memchr(s.buff, '\n', ft_strlen(s.buff)))
 		{
-			while (buff[len] != '\n')
+			while (s.buff[len] != '\n')
 				len++;
-			line = line_from_buff(&buff, len);
+			line = line_from_buff(len);
 			return (line);
 		}
-		len = ft_strlen(buff);
+		len = ft_strlen(s.buff);
 		// ft_memcpy(line, buff, ft_strlen(buff) + 1);
-		line = line_from_buff(&buff, len);
-		storage = read_line(fd, &buff, &index);
+		line = line_from_buff(len);
+		storage = read_line(fd);
 		if (storage == NULL && ft_strlen(line) < 1)
 		{
 			free(line);
@@ -159,6 +156,8 @@ char	*get_next_line(int fd)
 		return (temp);
 	}
 	else
-		storage = read_line(fd, &buff, &index);
+	{
+		storage = read_line(fd);
+	}
 	return (storage);
 }

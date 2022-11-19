@@ -16,6 +16,12 @@
 #include <fcntl.h>
 #include <stdio.h>
 
+static struct s_static
+{
+	int		index;
+	char	*buff;
+}			s;
+
 char	*get_next_line(int fd);
 size_t	ft_strlen(char const *s);
 void	*ft_memchr(const void *s, int c, size_t n);
