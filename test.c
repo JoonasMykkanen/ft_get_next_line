@@ -125,7 +125,8 @@ void	handle_overflow(char **buff, unsigned int ret, char *temp, int *index)
 	char 			*storage;
 
 	len = 0;
-	free(*buff);
+	if (*buff)
+		free(*buff);
 	*buff = NULL;
 	while (temp[len] != '\n' && len <= ret)
 	{
@@ -203,18 +204,22 @@ char	*read_line(int fd, char **buff, int	*index)
 			ft_memcpy(temp, storage, ft_strlen(storage));			
 			temp[ft_strlen(storage) + 1] = '\0';
 			free(storage);
-			storage = NULL; //might not be needed
+			storage = NULL;
 		}
 		storage = build_str(temp, buf, ret, &trigger);
 		free(temp);
 		if (trigger == 1)
 		{
-			// *buff = handle_overflow(ret, buf, index);
 			handle_overflow(buff, ret, buf, index);
 			*index = 0;
 			return (storage);
 		}
 		ret = read(fd, buf, BUFFER_SIZE);
+	}
+	if (!ret && ft_strlen(storage) == 0)
+	{
+		free(storage);
+		return (NULL);
 	}
 	return (storage);
 }
@@ -254,23 +259,22 @@ char	*get_next_line(int fd)
 	len = 0;
 	if (buff)
 	{
-		if (ft_memchr(buff, '\n', ft_strlen(buff))) //this is prolly causing strlen to overflow atm
+		if (ft_memchr(buff, '\n', ft_strlen(buff)))
 		{
 			while (buff[len] != '\n')
 				len++;
 			line = line_from_buff(&buff, len);
 			return (line);
 		}
-		line = malloc(sizeof(char) * ft_strlen(buff) + 1);
-		ft_memcpy(line, buff, ft_strlen(buff) + 1);
+		len = ft_strlen(buff);
+		line = line_from_buff(&buff, len);
 		storage = read_line(fd, &buff, &index);
-		if (len == 0 && ft_strlen(storage) == 0)
+		if (storage == NULL && ft_strlen(line) < 1)
 		{
 			free(line);
 			free(storage);
 			return (NULL);
 		}
-		// printf("-----line = %s storage = %s-----\n", line, storage);
 		temp = ft_strjoin(line, storage);
 		free(line);
 		free(storage);
@@ -287,18 +291,18 @@ int	main()
 	char	*file;
 	char 	*line;
 
-	file = "files/big_line_no_nl";
+	file = "files/41_with_nl";
 	fd = open(file, O_RDONLY);
 
 	line = get_next_line(fd);
 	printf("%s", line);
 	free(line);
-	// while (line != NULL)
-	// {
-	// 	line = get_next_line(fd);
-	// 	printf("%s", line);
-	// 	free(line);
-	// }
+	while (line)
+	{
+		line = get_next_line(fd);
+		printf("%s", line);
+		free(line);
+	}
 	close(fd);
 	return (0);
 }

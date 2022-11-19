@@ -38,7 +38,7 @@ char	*build_str(char *storage, char *temp, unsigned int ret, int *trigger)
 	static int		index = 0;
 	char			*str;
 	char			c;
-	unsigned int	i;
+	unsigned int	i;	
 
 	i = 0;
 	c = temp[i];
@@ -86,13 +86,12 @@ char	*read_line(int fd, char **buff, int	*index)
 			ft_memcpy(temp, storage, ft_strlen(storage));			
 			temp[ft_strlen(storage) + 1] = '\0';
 			free(storage);
-			storage = NULL; //might not be needed
+			storage = NULL;
 		}
 		storage = build_str(temp, buf, ret, &trigger);
 		free(temp);
 		if (trigger == 1)
 		{
-			// *buff = handle_overflow(ret, buf, index);
 			handle_overflow(buff, ret, buf, index);
 			*index = 0;
 			return (storage);
@@ -137,23 +136,23 @@ char	*get_next_line(int fd)
 	len = 0;
 	if (buff)
 	{
-		if (ft_memchr(buff, '\n', ft_strlen(buff))) //this is prolly causing strlen to overflow atm
+		if (ft_memchr(buff, '\n', ft_strlen(buff)))
 		{
 			while (buff[len] != '\n')
 				len++;
 			line = line_from_buff(&buff, len);
 			return (line);
 		}
-		line = malloc(sizeof(char) * ft_strlen(buff) + 1);
-		ft_memcpy(line, buff, ft_strlen(buff) + 1);
+		len = ft_strlen(buff);
+		// ft_memcpy(line, buff, ft_strlen(buff) + 1);
+		line = line_from_buff(&buff, len);
 		storage = read_line(fd, &buff, &index);
-		if (len == 0 && ft_strlen(storage) == 0)
+		if (storage == NULL && ft_strlen(line) < 1)
 		{
 			free(line);
 			free(storage);
 			return (NULL);
 		}
-		// printf("-----line = %s storage = %s-----\n", line, storage);
 		temp = ft_strjoin(line, storage);
 		free(line);
 		free(storage);
