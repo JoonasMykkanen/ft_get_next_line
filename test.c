@@ -10,6 +10,12 @@
 # define BUFFER_SIZE 42
 #endif
 
+struct s_static
+{
+	static 
+}		s_static;
+
+
 size_t	ft_strlen(char const *s);
 
 void	*ft_memcpy(void *dst, const void *src, size_t n)
@@ -118,6 +124,7 @@ size_t	ft_strlen(char const *s)
 		i++;
 	return (i);
 }
+
 void	handle_overflow(char **buff, unsigned int ret, char *temp, int *index)
 {
 	unsigned int	len;
@@ -275,7 +282,9 @@ char	*get_next_line(int fd)
 		return (temp);
 	}
 	else
+	{
 		storage = read_line(fd, &buff, &index);
+	}
 	return (storage);
 }
 
@@ -286,7 +295,7 @@ int	main()
 	char	*file;
 	char 	*line;
 
-	file = "files/bible";
+	file = "files/41_with_nl";
 	fd = open(file, O_RDONLY);
 
 	line = get_next_line(fd);
