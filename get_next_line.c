@@ -32,34 +32,30 @@ static void	handle_overflow(unsigned int ret, char *temp)
 	free(storage);
 }
 
-static char	*build_str(char *storage, char *temp, unsigned int ret, int *trigger)
+static char	*build_str(char *storage, char *temp, int ret, int *trigger)
 {
-	static int		index = 0;
-	char			*str;
-	char			c;
-	unsigned int	i;	
+	static int	index = 0;
+	char		*str;
+	int			i;	
 
-	i = 0;
-	c = temp[i];
+	i = -1;
 	str = malloc(sizeof(char) * (index + ret + 2));
 	if (!str)
 		return(NULL);
 	if (storage)
 		ft_memcpy(str, storage, index);
-	while (i < ret)
+	while (++i < ret)
 	{
-		c = temp[i];
-		str[index + i] = c;
-		if (c == '\n')
+		str[index + i] = temp[i];
+		if (temp[i] == '\n')
 		{
 			str[index + i + 1] = '\0';
 			*trigger = 1;
 			index = 0;
 			return (str);
 		}
-		i++;
 	}
-	str[index + i + 1] = '\0';
+	str[index + i] = '\0';
 	index += i;
 	return (str);
 }
@@ -79,7 +75,7 @@ static char	*read_line(int fd)
 		return (NULL);
 	while (ret)
 	{
-		temp = malloc(sizeof(char) * ft_strlen(storage) + 2); //prob fix
+		temp = malloc(sizeof(char) * ft_strlen(storage) + 2); //mby move to if statement
 		if (ft_strlen(storage) != 0)
 		{
 			ft_memcpy(temp, storage, ft_strlen(storage));			
@@ -100,6 +96,7 @@ static char	*read_line(int fd)
 	return (storage);
 }
 
+
 char	*line_from_buff(int len)
 {
 	char	*line;
@@ -107,18 +104,13 @@ char	*line_from_buff(int len)
 	int		size;
 
 	if (ft_memchr(s.buff, '\n', ft_strlen(s.buff)))
-	{
-		while (s.buff[len] != '\n')
-			len++;
-		
-	}
+		while (s.buff[++len] != '\n');
 	else
 		len = ft_strlen(s.buff);
 	size = ft_strlen(s.buff) - (size_t)len;
 	line = malloc(sizeof(char) * (len + 2));
 	ft_memcpy(line, s.buff, len + 1);
 	line[len + 1] = '\0';
-
 	if (size > len)
 	{
 		temp = malloc(sizeof(char) * (size + 1));
@@ -128,12 +120,10 @@ char	*line_from_buff(int len)
 		s.buff = malloc(sizeof(char) * (size + 1));
 		ft_memcpy(s.buff, temp, size + 1);
 		free(temp);
+		return (line);
 	}
-	else
-	{
-		free(s.buff);
-		s.buff = NULL;
-	}
+	free(s.buff);
+	s.buff = NULL;
 	return (line);
 }
 
@@ -144,7 +134,7 @@ char	*get_next_line(int fd)
 	char		*temp;
 	int			len;
 
-	len = 0;
+	len = -1;
 	if (s.buff)
 	{
 		if (ft_memchr(s.buff, '\n', ft_strlen(s.buff)))
