@@ -162,36 +162,31 @@ static void	handle_overflow(unsigned int ret, char *temp)
 static char	*build_str(char *storage, char *temp, int ret, int *trigger)
 {
 	static int	index = 0;
-	char		*str;
+	char		*buf;
 	int			i;	
 
 	i = -1;
-	str = malloc(sizeof(char) * (index + ret + 2));
-	if (!str)
-		return(NULL);
 	if (ft_strncmp(temp, "42", 2) == 0)
-	{
-		ft_memcpy(str, storage, ret);
-		str[ret] = '\0';
-		*trigger = 0;
-		return (str);
-	}
+		return (ft_strjoin("", storage));
+	buf = malloc(sizeof(char) * (index + ret + 2));
+	if (!buf)
+		return(NULL);
 	if (storage)
-		ft_memcpy(str, storage, index);
+		ft_memcpy(buf, storage, index);
 	while (++i < ret)
 	{
-		str[index + i] = temp[i];
+		buf[index + i] = temp[i];
 		if (temp[i] == '\n')
 		{
-			str[index + i + 1] = '\0';
+			buf[index + i + 1] = '\0';
 			*trigger = 1;
 			index = 0;
-			return (str);
+			return (buf);
 		}
 	}
-	str[index + i] = '\0';
+	buf[index + i] = '\0';
 	index += i;
-	return (str);
+	return (buf);
 }
 
 static char	*read_line(int fd, int ret, char *buf)
@@ -279,6 +274,7 @@ char	*get_next_line(int fd)
 	}
 	return (read_line(fd, 0, buf));
 }
+
 
 int	main()
 {
