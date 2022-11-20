@@ -1,12 +1,14 @@
 
 #include "get_next_line.h"
 
+
 static void	handle_overflow(unsigned int ret, char *temp)
 {
 	unsigned int	len;
 	char 			*storage;
 
 	len = 0;
+	s.index = 0;
 	free(s.buff);
 	s.buff = NULL;
 	while (temp[len] != '\n' && len <= ret)
@@ -42,6 +44,13 @@ static char	*build_str(char *storage, char *temp, int ret, int *trigger)
 	str = malloc(sizeof(char) * (index + ret + 2));
 	if (!str)
 		return(NULL);
+	if (*trigger == 42)
+	{
+		ft_memcpy(str, storage, ret);
+		str[ret] = '\0';
+		*trigger = 0;
+		return (str);
+	}
 	if (storage)
 		ft_memcpy(str, storage, index);
 	while (++i < ret)
@@ -60,9 +69,8 @@ static char	*build_str(char *storage, char *temp, int ret, int *trigger)
 	return (str);
 }
 
-static char	*read_line(int fd)
+static char	*read_line(int fd, int ret)
 {
-	int		ret;
 	char	*temp;
 	int		trigger;
 	char	*storage;
@@ -75,20 +83,18 @@ static char	*read_line(int fd)
 		return (NULL);
 	while (ret)
 	{
-		temp = malloc(sizeof(char) * ft_strlen(storage) + 2); //mby move to if statement
+		temp = NULL;
 		if (ft_strlen(storage) != 0)
 		{
-			ft_memcpy(temp, storage, ft_strlen(storage));			
-			temp[ft_strlen(storage) + 1] = '\0';
-			free(storage);
-			storage = NULL;
+			trigger = 42;
+			temp = build_str(storage, temp, ft_strlen(storage), &trigger);
 		}
+		free(storage);
 		storage = build_str(temp, buf, ret, &trigger);
 		free(temp);
 		if (trigger == 1)
 		{
 			handle_overflow(ret, buf);
-			s.index = 0;
 			return (storage);
 		}
 		ret = read(fd, buf, BUFFER_SIZE);
@@ -96,8 +102,75 @@ static char	*read_line(int fd)
 	return (storage);
 }
 
+// static char	*build_str(char *storage, char *temp, unsigned int ret, int *trigger)
+// {
+// 	static int		index = 0;
+// 	char			*str;
+// 	char			c;
+// 	unsigned int	i;	
+
+// 	i = 0;
+// 	c = temp[i];
+// 	str = malloc(sizeof(char) * (index + ret + 2));
+// 	if (!str)
+// 		return(NULL);
+// 	if (storage)
+// 		ft_memcpy(str, storage, index);
+// 	while (i < ret)
+// 	{
+// 		c = temp[i];
+// 		str[index + i] = c;
+// 		if (c == '\n')
+// 		{
+// 			str[index + i + 1] = '\0';
+// 			*trigger = 1;
+// 			index = 0;
+// 			return (str);
+// 		}
+// 		i++;
+// 	}
+// 	str[index + i + 1] = '\0';
+// 	index += i;
+// 	return (str);
+// }
+
+// static char	*read_line(int fd, int ret)
+// {
+// 	char	*temp;
+// 	int		trigger;
+// 	char	*storage;
+// 	char	buf[BUFFER_SIZE];
+
+// 	trigger = 0;
+// 	storage = NULL;
+// 	ret = read(fd, buf, BUFFER_SIZE);
+// 	if (ret == -1)
+// 		return (NULL);
+// 	while (ret)
+// 	{
+// 		temp = malloc(sizeof(char) * ft_strlen(storage) + 2); //mby move to if statement
+// 		if (ft_strlen(storage) != 0)
+// 		{
+// 			ft_memcpy(temp, storage, ft_strlen(storage));			
+// 			temp[ft_strlen(storage) + 1] = '\0';
+// 			free(storage);
+// 			storage = NULL;
+// 		}
+// 		storage = build_str(temp, buf, ret, &trigger);
+// 		free(temp);
+// 		if (trigger == 1)
+// 		{
+// 			handle_overflow(ret, buf);
+// 			s.index = 0;
+// 			return (storage);
+// 		}
+// 		ret = read(fd, buf, BUFFER_SIZE);
+// 	}
+// 	return (storage);
+// }
 
 char	*line_from_buff(int len)
+
 {
 	char	*line;
 	char 	*temp;
@@ -129,18 +202,20 @@ char	*line_from_buff(int len)
 
 char	*get_next_line(int fd)
 {
-	char		*line;
 	char		*storage;
+	char		*line;
 	char		*temp;
 	int			len;
+	int			ret;
 
+	ret = 0;
 	len = -1;
 	if (s.buff)
 	{
 		if (ft_memchr(s.buff, '\n', ft_strlen(s.buff)))
 			return (line_from_buff(len));
 		line = line_from_buff(len);
-		storage = read_line(fd);
+		storage = read_line(fd, ret);
 		if (storage == NULL && ft_strlen(line) < 1)
 		{
 			free(line);
@@ -152,5 +227,5 @@ char	*get_next_line(int fd)
 		free(storage);
 		return (temp);
 	}
-	return (read_line(fd));
+	return (read_line(fd, ret));
 }
