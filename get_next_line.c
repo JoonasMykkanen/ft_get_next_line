@@ -100,14 +100,22 @@ char	*read_line(int fd)
 	return (storage);
 }
 
-char	*line_from_buff(int len)
+char	*line_from_buff(void)
 {
 	char	*line;
 	char 	*temp;
 	int		size;
+	int 	len;
 
-	size = ft_strlen(s.buff) - len;
-	// if statement can cause segfault
+	len = 0;
+	if (ft_memchr(s.buff, '\n', ft_strlen(s.buff)))
+	{
+		while (s.buff[len] != '\n')
+			len++;
+	}
+	else
+		len = ft_strlen(s.buff);
+	size = ft_strlen(s.buff);
 	line = malloc(sizeof(char) * (len + 2));
 	temp = malloc(sizeof(char) * (size + 1));
 	if (!line || !temp)
@@ -128,21 +136,12 @@ char	*get_next_line(int fd)
 	char		*line;
 	char		*storage;
 	char		*temp;
-	int			len;
 
-	len = 0;
 	if (s.buff)
 	{
 		if (ft_memchr(s.buff, '\n', ft_strlen(s.buff)))
-		{
-			while (s.buff[len] != '\n')
-				len++;
-			line = line_from_buff(len);
-			return (line);
-		}
-		len = ft_strlen(s.buff);
-		// ft_memcpy(line, buff, ft_strlen(buff) + 1);
-		line = line_from_buff(len);
+			return (line_from_buff());
+		line = line_from_buff();
 		storage = read_line(fd);
 		if (storage == NULL && ft_strlen(line) < 1)
 		{
@@ -156,8 +155,6 @@ char	*get_next_line(int fd)
 		return (temp);
 	}
 	else
-	{
 		storage = read_line(fd);
-	}
 	return (storage);
 }
