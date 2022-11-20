@@ -127,35 +127,38 @@ static struct s_static
 	char	*buff;
 }			s;
 
+struct s_variables
+{
+	unsigned int	ho_len;
+	int				lfb_size;
+	int				bs_i;
+}					var;
+
 static void	handle_overflow(unsigned int ret, char *temp)
 {
-	unsigned int	len;
-	char 			*storage;
+	char	*storage;
 
-	len = 0;
+	var.ho_len = -1;
 	s.index = 0;
 	free(s.buff);
 	s.buff = NULL;
-	while (temp[len] != '\n' && len <= ret)
-	{
+	while (temp[++var.ho_len] != '\n' && var.ho_len <= ret)
 		s.index += 1;
-		len++;
-	}
 	s.index += 1;
-	len++;
-	len = ret - len;
-	if (len == 0)
+	var.ho_len++;
+	var.ho_len = ret - var.ho_len;
+	if (var.ho_len == 0)
 		return ;
-	storage = malloc(sizeof(char) * (len + 1));
-	ft_memcpy(storage, temp + s.index, len);
-	storage[len] = '\0';
-	s.buff = malloc(sizeof(char) * (len + 1));
-	if (!s.buff || len < 1)
+	storage = malloc(sizeof(char) * (var.ho_len + 1));
+	ft_memcpy(storage, temp + s.index, var.ho_len);
+	storage[var.ho_len] = '\0';
+	s.buff = malloc(sizeof(char) * (var.ho_len + 1));
+	if (!s.buff || var.ho_len < 1)
 	{
 		free(storage);
 		return ;
 	}
-	ft_memcpy(s.buff, storage, len + 1);
+	ft_memcpy(s.buff, storage, var.ho_len + 1);
 	free(storage);
 }
 
@@ -163,29 +166,28 @@ static char	*build_str(char *storage, char *temp, int ret, int *trigger)
 {
 	static int	index = 0;
 	char		*buf;
-	int			i;	
 
-	i = -1;
+	var.bs_i = -1;
 	if (ft_strncmp(temp, "42", 2) == 0)
 		return (ft_strjoin("", storage));
 	buf = malloc(sizeof(char) * (index + ret + 2));
 	if (!buf)
-		return(NULL);
+		return (NULL);
 	if (storage)
 		ft_memcpy(buf, storage, index);
-	while (++i < ret)
+	while (++var.bs_i < ret)
 	{
-		buf[index + i] = temp[i];
-		if (temp[i] == '\n')
+		buf[index + var.bs_i] = temp[var.bs_i];
+		if (temp[var.bs_i] == '\n')
 		{
-			buf[index + i + 1] = '\0';
+			buf[index + var.bs_i + 1] = '\0';
 			*trigger = 1;
 			index = 0;
 			return (buf);
 		}
 	}
-	buf[index + i] = '\0';
-	index += i;
+	buf[index + var.bs_i] = '\0';
+	index += var.bs_i;
 	return (buf);
 }
 
@@ -221,25 +223,25 @@ static char	*read_line(int fd, int ret, char *buf)
 char	*line_from_buff(int len)
 {
 	char	*line;
-	char 	*temp;
-	int		size;
+	char	*temp;
 
 	if (ft_memchr(s.buff, '\n', ft_strlen(s.buff)))
-		while (s.buff[++len] != '\n');
+		while (s.buff[++len] != '\n')
+			;
 	else
 		len = ft_strlen(s.buff);
-	size = ft_strlen(s.buff) - (size_t)len;
+	var.lfb_size = ft_strlen(s.buff) - (size_t)len;
 	line = malloc(sizeof(char) * (len + 2));
 	ft_memcpy(line, s.buff, len + 1);
 	line[len + 1] = '\0';
-	if (size > len)
+	if (var.lfb_size > len)
 	{
-		temp = malloc(sizeof(char) * (size + 1));
-		ft_memcpy(temp, s.buff + len + 1, size);
-		temp[size] = '\0';
+		temp = malloc(sizeof(char) * (var.lfb_size + 1));
+		ft_memcpy(temp, s.buff + len + 1, var.lfb_size);
+		temp[var.lfb_size] = '\0';
 		free(s.buff);
-		s.buff = malloc(sizeof(char) * (size + 1));
-		ft_memcpy(s.buff, temp, size + 1);
+		s.buff = malloc(sizeof(char) * (var.lfb_size + 1));
+		ft_memcpy(s.buff, temp, var.lfb_size + 1);
 		free(temp);
 		return (line);
 	}
@@ -274,7 +276,6 @@ char	*get_next_line(int fd)
 	}
 	return (read_line(fd, 0, buf));
 }
-
 
 int	main()
 {
