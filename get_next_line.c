@@ -1,7 +1,7 @@
 
 #include "get_next_line.h"
 
-void	handle_overflow(unsigned int ret, char *temp)
+static void	handle_overflow(unsigned int ret, char *temp)
 {
 	unsigned int	len;
 	char 			*storage;
@@ -32,7 +32,7 @@ void	handle_overflow(unsigned int ret, char *temp)
 	free(storage);
 }
 
-char	*build_str(char *storage, char *temp, unsigned int ret, int *trigger)
+static char	*build_str(char *storage, char *temp, unsigned int ret, int *trigger)
 {
 	static int		index = 0;
 	char			*str;
@@ -64,7 +64,7 @@ char	*build_str(char *storage, char *temp, unsigned int ret, int *trigger)
 	return (str);
 }
 
-char	*read_line(int fd)
+static char	*read_line(int fd)
 {
 	int		ret;
 	char	*temp;
@@ -100,34 +100,40 @@ char	*read_line(int fd)
 	return (storage);
 }
 
-char	*line_from_buff(void)
+char	*line_from_buff(int len)
 {
 	char	*line;
 	char 	*temp;
 	int		size;
-	int 	len;
 
-	len = 0;
 	if (ft_memchr(s.buff, '\n', ft_strlen(s.buff)))
 	{
 		while (s.buff[len] != '\n')
 			len++;
+		
 	}
 	else
 		len = ft_strlen(s.buff);
-	size = ft_strlen(s.buff);
+	size = ft_strlen(s.buff) - (size_t)len;
 	line = malloc(sizeof(char) * (len + 2));
-	temp = malloc(sizeof(char) * (size + 1));
-	if (!line || !temp)
-		return (NULL);
 	ft_memcpy(line, s.buff, len + 1);
 	line[len + 1] = '\0';
-	ft_memcpy(temp, s.buff + len + 1, size);
-	temp[size] = '\0';
-	free(s.buff);
-	s.buff = malloc(sizeof(char) * (size + 1));
-	ft_memcpy(s.buff, temp, size + 1);
-	free(temp);
+
+	if (size > len)
+	{
+		temp = malloc(sizeof(char) * (size + 1));
+		ft_memcpy(temp, s.buff + len + 1, size);
+		temp[size] = '\0';
+		free(s.buff);
+		s.buff = malloc(sizeof(char) * (size + 1));
+		ft_memcpy(s.buff, temp, size + 1);
+		free(temp);
+	}
+	else
+	{
+		free(s.buff);
+		s.buff = NULL;
+	}
 	return (line);
 }
 
@@ -136,12 +142,14 @@ char	*get_next_line(int fd)
 	char		*line;
 	char		*storage;
 	char		*temp;
+	int			len;
 
+	len = 0;
 	if (s.buff)
 	{
 		if (ft_memchr(s.buff, '\n', ft_strlen(s.buff)))
-			return (line_from_buff());
-		line = line_from_buff();
+			return (line_from_buff(len));
+		line = line_from_buff(len);
 		storage = read_line(fd);
 		if (storage == NULL && ft_strlen(line) < 1)
 		{
@@ -154,7 +162,5 @@ char	*get_next_line(int fd)
 		free(storage);
 		return (temp);
 	}
-	else
-		storage = read_line(fd);
-	return (storage);
+	return (read_line(fd));
 }
