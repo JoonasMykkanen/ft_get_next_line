@@ -1,5 +1,3 @@
-
-
 #include "get_next_line.h"
 
 void	*ft_memcpy(void *dst, const void *src, size_t n)
@@ -50,7 +48,7 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	int		j;
 	char	*str;
 
-	str = (char *)malloc(sizeof(char) * (ft_strlen(s1, 0) + ft_strlen(s2, 0) + 1));
+	str = malloc(sizeof(char) * (ft_strlen(s1, 0) + ft_strlen(s2, 0) + 1));
 	if (str == NULL)
 		return (NULL);
 	i = 0;
@@ -68,7 +66,7 @@ char	*ft_strjoin(char const *s1, char const *s2)
 		i++;
 		j++;
 	}
-	str[i] = '\0';	
+	str[i] = '\0';
 	return (str);
 }
 
