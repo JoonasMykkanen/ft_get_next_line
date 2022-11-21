@@ -126,6 +126,7 @@ struct s_variables
 	unsigned int	ho_len;
 	int				lfb_size;
 	int				bs_i;
+	int				gnl_len;
 }					var;
 
 static void	handle_overflow(unsigned int ret, char *temp)
@@ -161,7 +162,9 @@ static char	*build_str(char *storage, char *temp, int ret, int *trigger)
 	var.bs_i = -1;
 	if (temp == NULL)
 		return (ft_strjoin("", storage));
-	buf = ft_calloc(index + ret + 2, 1);
+	buf = malloc(index + ret + 2);
+	if (!buf)
+		return (NULL);
 	if (storage)
 		ft_memcpy(buf, storage, index);
 	while (++var.bs_i < ret)
