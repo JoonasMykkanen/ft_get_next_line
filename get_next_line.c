@@ -17,7 +17,6 @@ struct s_variables
 	unsigned int	ho_len;
 	int				lfb_size;
 	int				bs_i;
-	int				gnl_len;
 }					var;
 
 static void	handle_overflow(unsigned int ret, char *temp)
@@ -35,16 +34,13 @@ static void	handle_overflow(unsigned int ret, char *temp)
 	var.ho_len = ret - var.ho_len;
 	if (var.ho_len == 0)
 		return ;
-	storage = ft_calloc(var.ho_len + 1, 1);
-	ft_memcpy(storage, temp + s.index, var.ho_len);
-	storage[var.ho_len] = '\0';
-	s.buff = ft_calloc(var.ho_len + 1, 1);
+	storage = ft_strldup(temp + s.index, var.ho_len);
+	s.buff = ft_strldup(storage, var.ho_len);
 	if (!s.buff || var.ho_len < 1)
 	{
 		free(storage);
 		return ;
 	}
-	ft_memcpy(s.buff, storage, var.ho_len + 1);
 	free(storage);
 }
 
@@ -89,8 +85,8 @@ static char	*read_line(int fd, int ret, char *buf)
 	while (ret)
 	{
 		temp = NULL;
-		if (ft_strlen(storage) != 0)
-			temp = build_str(storage, NULL, ft_strlen(storage), &trigger);
+		if (ft_strlen(storage, 0) != 0)
+			temp = build_str(storage, NULL, ft_strlen(storage, 0), &trigger);
 		free(storage);
 		storage = build_str(temp, buf, ret, &trigger);
 		free(temp);
@@ -109,23 +105,17 @@ char	*line_from_buff(int len)
 	char	*line;
 	char	*temp;
 
-	if (ft_memchr(s.buff, '\n', ft_strlen(s.buff)))
-	{
-		while (s.buff[++len] != '\n')
-			;
-	}
-	var.lfb_size = ft_strlen(s.buff) - (size_t)len;
-	line = ft_calloc(len + 2, 1);
-	ft_memcpy(line, s.buff, len + 1);
-	line[len + 1] = '\0';
+	if (ft_memchr(s.buff, '\n', ft_strlen(s.buff, 0)))
+		len = ft_strlen(s.buff, 42);
+	else
+		len = ft_strlen(s.buff, 0);
+	var.lfb_size = ft_strlen(s.buff, 0) - (size_t)len;
+	line = ft_strldup(s.buff, len + 1);
 	if (var.lfb_size > len)
 	{
-		temp = ft_calloc(var.lfb_size + 1, 1);
-		ft_memcpy(temp, s.buff + len + 1, var.lfb_size);
-		temp[var.lfb_size] = '\0';
+		temp = ft_strldup(s.buff + len + 1, var.lfb_size);
 		free(s.buff);
-		s.buff = ft_calloc(var.lfb_size + 1, 1);
-		ft_memcpy(s.buff, temp, var.lfb_size + 1);
+		s.buff = ft_strldup(temp, var.lfb_size);
 		free(temp);
 		return (line);
 	}
@@ -138,26 +128,25 @@ char	*get_next_line(int fd)
 {
 	char		buf[BUFFER_SIZE];
 	char		*storage;
-	char		*line;
 	char		*temp;
+	char		*line;
 
 	if (s.buff)
 	{
-		if (ft_memchr(s.buff, '\n', ft_strlen(s.buff)))
+		if (ft_memchr(s.buff, '\n', ft_strlen(s.buff, 0)))
 			return (line_from_buff(-1));
-		var.gnl_len = ft_strlen(s.buff);
-		line = line_from_buff(var.gnl_len);
+		temp = line_from_buff(-1);
 		storage = read_line(fd, 0, buf);
-		if (storage == NULL && ft_strlen(line) < 1)
+		if (storage == NULL && ft_strlen(temp, 0) < 1)
 		{
-			free(line);
+			free(temp);
 			free(storage);
 			return (NULL);
 		}
-		temp = ft_strjoin(line, storage);
-		free(line);
+		line = ft_strjoin(temp, storage);
+		free(temp);
 		free(storage);
-		return (temp);
+		return (line);
 	}
 	return (read_line(fd, 0, buf));
 }

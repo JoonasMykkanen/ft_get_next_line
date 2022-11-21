@@ -30,7 +30,8 @@ static struct s_static
 // }					s_var;
 
 char	*get_next_line(int fd);
-size_t	ft_strlen(char const *s);
+char	*ft_strldup(char *src, int len);
+size_t	ft_strlen(char const *s, int mode);
 void	*ft_calloc(size_t count, size_t size);
 void	*ft_memchr(const void *s, int c, size_t n);
 char	*ft_strjoin(char const *s1, char const *s2);
