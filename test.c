@@ -13,6 +13,37 @@
 
 size_t	ft_strlen(char const *s);
 
+int	ft_strncmp(const char *s1, const char *s2, size_t n)
+{
+	int				i;
+	unsigned char	*str1;
+	unsigned char	*str2;
+
+	i = 0;
+	str1 = (unsigned char *)s1;
+	str2 = (unsigned char *)s2;
+	while (n > 0 && str1[i] != '\0' && str1[i] == str2[i])
+	{
+		n--;
+		i++;
+	}
+	if (n == 0)
+		return (0);
+	return (str1[i] - str2[i]);
+}
+
+void	*ft_calloc(size_t count, size_t size)
+{
+	int		len;
+	void	*ptr;
+
+	len = count * size;
+	ptr = malloc(len);
+	if (ptr)
+		return (ptr);
+	return (NULL);
+}
+
 void	*ft_memcpy(void *dst, const void *src, size_t n)
 {
 	size_t			i;
@@ -83,44 +114,18 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	return (str);
 }
 
-int	ft_strncmp(const char *s1, const char *s2, size_t n)
-{
-	int				i;
-	unsigned char	*str1;
-	unsigned char	*str2;
-
-	i = 0;
-	str1 = (unsigned char *)s1;
-	str2 = (unsigned char *)s2;
-	if (!s1 || !s2)
-		return (0);
-	while (n > 0 && str1[i] != '\0' && str1[i] == str2[i])
-	{
-		n--;
-		i++;
-	}
-	if (n == 0)
-		return (0);
-	return (str1[i] - str2[i]);
-}
-
 size_t	ft_strlen(char const *s)
 {
 	int	i;
 
 	i = 0;
 	if (s == NULL || !s)
-	{
 		return (0);
-	}
-	if (ft_strncmp(s, "", 1) == 0)
-	{
-		return (0);
-	}
 	while (s[i] != '\0')
 		i++;
 	return (i);
 }
+
 static struct s_static
 {
 	int		index;
@@ -132,6 +137,7 @@ struct s_variables
 	unsigned int	ho_len;
 	int				lfb_size;
 	int				bs_i;
+	int				gnl_len;
 }					var;
 
 static void	handle_overflow(unsigned int ret, char *temp)
@@ -149,10 +155,10 @@ static void	handle_overflow(unsigned int ret, char *temp)
 	var.ho_len = ret - var.ho_len;
 	if (var.ho_len == 0)
 		return ;
-	storage = malloc(sizeof(char) * (var.ho_len + 1));
+	storage = ft_calloc(var.ho_len + 1, 1);
 	ft_memcpy(storage, temp + s.index, var.ho_len);
 	storage[var.ho_len] = '\0';
-	s.buff = malloc(sizeof(char) * (var.ho_len + 1));
+	s.buff = ft_calloc(var.ho_len + 1, 1);
 	if (!s.buff || var.ho_len < 1)
 	{
 		free(storage);
@@ -168,11 +174,9 @@ static char	*build_str(char *storage, char *temp, int ret, int *trigger)
 	char		*buf;
 
 	var.bs_i = -1;
-	if (ft_strncmp(temp, "42", 2) == 0)
+	if (ft_memchr(temp, 37, 2))
 		return (ft_strjoin("", storage));
-	buf = malloc(sizeof(char) * (index + ret + 2));
-	if (!buf)
-		return (NULL);
+	buf = ft_calloc(index + ret + 2, 1);
 	if (storage)
 		ft_memcpy(buf, storage, index);
 	while (++var.bs_i < ret)
@@ -191,6 +195,8 @@ static char	*build_str(char *storage, char *temp, int ret, int *trigger)
 	return (buf);
 }
 
+
+
 static char	*read_line(int fd, int ret, char *buf)
 {
 	char	*temp;
@@ -206,7 +212,7 @@ static char	*read_line(int fd, int ret, char *buf)
 	{
 		temp = NULL;
 		if (ft_strlen(storage) != 0)
-			temp = build_str(storage, "42", ft_strlen(storage), &trigger);
+			temp = build_str(storage, "", ft_strlen(storage), &trigger);
 		free(storage);
 		storage = build_str(temp, buf, ret, &trigger);
 		free(temp);
@@ -226,21 +232,27 @@ char	*line_from_buff(int len)
 	char	*temp;
 
 	if (ft_memchr(s.buff, '\n', ft_strlen(s.buff)))
+	{
 		while (s.buff[++len] != '\n')
 			;
-	else
-		len = ft_strlen(s.buff);
+	}
 	var.lfb_size = ft_strlen(s.buff) - (size_t)len;
 	line = malloc(sizeof(char) * (len + 2));
+	if (!line)
+		return (NULL);
 	ft_memcpy(line, s.buff, len + 1);
 	line[len + 1] = '\0';
 	if (var.lfb_size > len)
 	{
 		temp = malloc(sizeof(char) * (var.lfb_size + 1));
+		if (!temp)
+			return (NULL);
 		ft_memcpy(temp, s.buff + len + 1, var.lfb_size);
 		temp[var.lfb_size] = '\0';
 		free(s.buff);
 		s.buff = malloc(sizeof(char) * (var.lfb_size + 1));
+		if (!s.buff)
+			return (NULL);
 		ft_memcpy(s.buff, temp, var.lfb_size + 1);
 		free(temp);
 		return (line);
@@ -261,7 +273,8 @@ char	*get_next_line(int fd)
 	{
 		if (ft_memchr(s.buff, '\n', ft_strlen(s.buff)))
 			return (line_from_buff(-1));
-		line = line_from_buff(-1);
+		var.gnl_len = ft_strlen(s.buff);
+		line = line_from_buff(var.gnl_len);
 		storage = read_line(fd, 0, buf);
 		if (storage == NULL && ft_strlen(line) < 1)
 		{
@@ -276,6 +289,7 @@ char	*get_next_line(int fd)
 	}
 	return (read_line(fd, 0, buf));
 }
+
 
 int	main()
 {

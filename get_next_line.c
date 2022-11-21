@@ -35,10 +35,10 @@ static void	handle_overflow(unsigned int ret, char *temp)
 	var.ho_len = ret - var.ho_len;
 	if (var.ho_len == 0)
 		return ;
-	storage = malloc(sizeof(char) * (var.ho_len + 1));
+	storage = ft_calloc(var.ho_len + 1, 1);
 	ft_memcpy(storage, temp + s.index, var.ho_len);
 	storage[var.ho_len] = '\0';
-	s.buff = malloc(sizeof(char) * (var.ho_len + 1));
+	s.buff = ft_calloc(var.ho_len + 1, 1);
 	if (!s.buff || var.ho_len < 1)
 	{
 		free(storage);
@@ -54,11 +54,9 @@ static char	*build_str(char *storage, char *temp, int ret, int *trigger)
 	char		*buf;
 
 	var.bs_i = -1;
-	if (ft_strncmp(temp, "42", 2) == 0)
+	if (temp == NULL)
 		return (ft_strjoin("", storage));
-	buf = malloc(sizeof(char) * (index + ret + 2));
-	if (!buf)
-		return (NULL);
+	buf = ft_calloc(index + ret + 2, 1);
 	if (storage)
 		ft_memcpy(buf, storage, index);
 	while (++var.bs_i < ret)
@@ -92,7 +90,7 @@ static char	*read_line(int fd, int ret, char *buf)
 	{
 		temp = NULL;
 		if (ft_strlen(storage) != 0)
-			temp = build_str(storage, "42", ft_strlen(storage), &trigger);
+			temp = build_str(storage, NULL, ft_strlen(storage), &trigger);
 		free(storage);
 		storage = build_str(temp, buf, ret, &trigger);
 		free(temp);
@@ -113,21 +111,20 @@ char	*line_from_buff(int len)
 
 	if (ft_memchr(s.buff, '\n', ft_strlen(s.buff)))
 	{
-		len = -1;
 		while (s.buff[++len] != '\n')
 			;
 	}
 	var.lfb_size = ft_strlen(s.buff) - (size_t)len;
-	line = malloc(sizeof(char) * (len + 2));
+	line = ft_calloc(len + 2, 1);
 	ft_memcpy(line, s.buff, len + 1);
 	line[len + 1] = '\0';
 	if (var.lfb_size > len)
 	{
-		temp = malloc(sizeof(char) * (var.lfb_size + 1));
+		temp = ft_calloc(var.lfb_size + 1, 1);
 		ft_memcpy(temp, s.buff + len + 1, var.lfb_size);
 		temp[var.lfb_size] = '\0';
 		free(s.buff);
-		s.buff = malloc(sizeof(char) * (var.lfb_size + 1));
+		s.buff = ft_calloc(var.lfb_size + 1, 1);
 		ft_memcpy(s.buff, temp, var.lfb_size + 1);
 		free(temp);
 		return (line);

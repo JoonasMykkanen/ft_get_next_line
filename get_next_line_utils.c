@@ -72,39 +72,28 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	return (str);
 }
 
-int	ft_strncmp(const char *s1, const char *s2, size_t n)
-{
-	int				i;
-	unsigned char	*str1;
-	unsigned char	*str2;
-
-	i = 0;
-	str1 = (unsigned char *)s1;
-	str2 = (unsigned char *)s2;
-	while (n > 0 && str1[i] != '\0' && str1[i] == str2[i])
-	{
-		n--;
-		i++;
-	}
-	if (n == 0)
-		return (0);
-	return (str1[i] - str2[i]);
-}
-
 size_t	ft_strlen(char const *s)
 {
 	int	i;
 
 	i = 0;
 	if (s == NULL || !s)
-	{
 		return (0);
-	}
-	if (ft_strncmp(s, "", 1) == 0)
-	{
-		return (0);
-	}
 	while (s[i] != '\0')
 		i++;
 	return (i);
+}
+
+void	*ft_calloc(size_t count, size_t size)
+{
+	int		len;
+	void	*ptr;
+
+	len = count * size;
+	ptr = malloc(len);
+	if (ptr)
+	{
+		return (ptr);
+	}
+	return (NULL);
 }
