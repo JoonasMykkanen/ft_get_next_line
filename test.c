@@ -6,8 +6,10 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "get_next_line.h"
+
 #ifndef BUFFER_SIZE
-# define BUFFER_SIZE 42
+# define BUFFER_SIZE 10000000
 #endif
 
 
@@ -111,15 +113,9 @@ char	*ft_strldup(char *src, int len)
 	if (!dst)
 		return (NULL);
 	ft_memcpy(dst, src, len);
-	dst[len + 1] = '\0';
+	dst[len] = '\0';
 	return (dst);
 }
-
-static struct s_static
-{
-	int		index;
-	char	*buff;
-}			s;
 
 struct s_variables
 {
@@ -270,7 +266,7 @@ int	main()
 	char	*file;
 	char 	*line;
 
-	file = "files/file.txt";
+	file = "files/alternate_line_nl_no_nl";
 	fd = open(file, O_RDONLY);
 
 	line = get_next_line(fd);

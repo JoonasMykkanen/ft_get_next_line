@@ -90,20 +90,6 @@ size_t	ft_strlen(char const *s, int mode)
 	return (i);
 }
 
-void	*ft_calloc(size_t count, size_t size)
-{
-	int		len;
-	void	*ptr;
-
-	len = count * size;
-	ptr = malloc(len);
-	if (ptr)
-	{
-		return (ptr);
-	}
-	return (NULL);
-}
-
 char	*ft_strldup(char *src, int len)
 {
 	char	*dst;
@@ -114,6 +100,6 @@ char	*ft_strldup(char *src, int len)
 	if (!dst)
 		return (NULL);
 	ft_memcpy(dst, src, len);
-	dst[len + 1] = '\0';
+	dst[len] = '\0';
 	return (dst);
 }
