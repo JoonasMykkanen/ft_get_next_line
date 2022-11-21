@@ -11,11 +11,13 @@
 /* ************************************************************************** */
 
 #include "get_next_line.h"
+
 struct s_variables
 {
 	unsigned int	ho_len;
 	int				lfb_size;
 	int				bs_i;
+	int				gnl_len;
 }					var;
 
 static void	handle_overflow(unsigned int ret, char *temp)
@@ -110,10 +112,11 @@ char	*line_from_buff(int len)
 	char	*temp;
 
 	if (ft_memchr(s.buff, '\n', ft_strlen(s.buff)))
+	{
+		len = -1;
 		while (s.buff[++len] != '\n')
 			;
-	else
-		len = ft_strlen(s.buff);
+	}
 	var.lfb_size = ft_strlen(s.buff) - (size_t)len;
 	line = malloc(sizeof(char) * (len + 2));
 	ft_memcpy(line, s.buff, len + 1);
@@ -145,7 +148,8 @@ char	*get_next_line(int fd)
 	{
 		if (ft_memchr(s.buff, '\n', ft_strlen(s.buff)))
 			return (line_from_buff(-1));
-		line = line_from_buff(-1);
+		var.gnl_len = ft_strlen(s.buff);
+		line = line_from_buff(var.gnl_len);
 		storage = read_line(fd, 0, buf);
 		if (storage == NULL && ft_strlen(line) < 1)
 		{
