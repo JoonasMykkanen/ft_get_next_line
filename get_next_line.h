@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line.h                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jmykkane <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/11/22 09:03:38 by jmykkane          #+#    #+#             */
+/*   Updated: 2022/11/22 09:03:40 by jmykkane         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef GET_NEXT_LINE_H
 # define GET_NEXT_LINE_H
 
@@ -18,12 +30,12 @@ static struct s_static
 	char	*buff;
 }			s;
 
-// struct	s_variables
+// struct s_variables
 // {
 // 	unsigned int	ho_len;
 // 	int				lfb_size;
 // 	int				bs_i;
-// }					s_var;
+// }					var;
 
 char	*get_next_line(int fd);
 char	*ft_strldup(char *src, int len);

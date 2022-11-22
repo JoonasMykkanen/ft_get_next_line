@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jmykkane <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/11/22 09:03:21 by jmykkane          #+#    #+#             */
+/*   Updated: 2022/11/22 09:03:25 by jmykkane         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "get_next_line.h"
 
 struct s_variables
@@ -5,7 +17,6 @@ struct s_variables
 	unsigned int	ho_len;
 	int				lfb_size;
 	int				bs_i;
-	int				gnl_len;
 }					var;
 
 static void	handle_overflow(unsigned int ret, char *temp)
@@ -102,7 +113,8 @@ char	*line_from_buff(int len)
 		len = ft_strlen(s.buff, 0);
 	var.lfb_size = ft_strlen(s.buff, 0) - (size_t)len;
 	line = ft_strldup(s.buff, len + 1);
-	if (var.lfb_size > len)
+	// if (var.lfb_size > len)
+	if (var.lfb_size > 0)
 	{
 		temp = ft_strldup(s.buff + len + 1, var.lfb_size);
 		free(s.buff);

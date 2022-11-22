@@ -117,13 +117,13 @@ char	*ft_strldup(char *src, int len)
 	return (dst);
 }
 
-struct s_variables
-{
-	unsigned int	ho_len;
-	int				lfb_size;
-	int				bs_i;
-	int				gnl_len;
-}					var;
+// struct s_variables
+// {
+// 	unsigned int	ho_len;
+// 	int				lfb_size;
+// 	int				bs_i;
+// 	int				gnl_len;
+// }					var;
 
 static void	handle_overflow(unsigned int ret, char *temp)
 {
@@ -214,12 +214,13 @@ char	*line_from_buff(int len)
 	char	*temp;
 
 	if (ft_memchr(s.buff, '\n', ft_strlen(s.buff, 0)))
-		len = ft_strlen(s.buff, 42);
+		len = ft_strlen(s.buff, 42); // if there is two new lines in buff, this fucks up
 	else
 		len = ft_strlen(s.buff, 0);
 	var.lfb_size = ft_strlen(s.buff, 0) - (size_t)len;
 	line = ft_strldup(s.buff, len + 1);
-	if (var.lfb_size > len)
+	// if (var.lfb_size > len)
+	if (var.lfb_size > 0)
 	{
 		temp = ft_strldup(s.buff + len + 1, var.lfb_size);
 		free(s.buff);
@@ -266,7 +267,7 @@ int	main()
 	char	*file;
 	char 	*line;
 
-	file = "files/alternate_line_nl_no_nl";
+	file = "files/file.txt";
 	fd = open(file, O_RDONLY);
 
 	line = get_next_line(fd);
