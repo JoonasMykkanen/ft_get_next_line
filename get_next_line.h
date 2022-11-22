@@ -24,19 +24,6 @@
 # include <sys/uio.h>
 # include <sys/types.h>
 
-static struct s_static
-{
-	int		index;
-	char	*buff;
-}			s;
-
-// struct s_variables
-// {
-// 	unsigned int	ho_len;
-// 	int				lfb_size;
-// 	int				bs_i;
-// }					var;
-
 char	*get_next_line(int fd);
 char	*ft_strldup(char *src, int len);
 size_t	ft_strlen(char const *s, int mode);

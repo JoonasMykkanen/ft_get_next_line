@@ -117,13 +117,13 @@ char	*ft_strldup(char *src, int len)
 	return (dst);
 }
 
-// struct s_variables
-// {
-// 	unsigned int	ho_len;
-// 	int				lfb_size;
-// 	int				bs_i;
-// 	int				gnl_len;
-// }					var;
+typedef struct s_variables
+{
+	unsigned int	ho_len;
+	int				lfb_size;
+	int				bs_i;
+	int				gnl_len;
+}					var;
 
 static void	handle_overflow(unsigned int ret, char *temp)
 {
@@ -153,9 +153,10 @@ static void	handle_overflow(unsigned int ret, char *temp)
 static char	*build_str(char *storage, char *temp, int ret, int *trigger)
 {
 	static int	index = 0;
+	int			i;
 	char		*buf;
 
-	var.bs_i = -1;
+	i = -1;
 	if (temp == NULL)
 		return (ft_strjoin("", storage));
 	buf = malloc(index + ret + 2);
@@ -163,19 +164,19 @@ static char	*build_str(char *storage, char *temp, int ret, int *trigger)
 		return (NULL);
 	if (storage)
 		ft_memcpy(buf, storage, index);
-	while (++var.bs_i < ret)
+	while (++i < ret)
 	{
-		buf[index + var.bs_i] = temp[var.bs_i];
-		if (temp[var.bs_i] == '\n')
+		buf[index + i] = temp[i];
+		if (temp[i] == '\n')
 		{
-			buf[index + var.bs_i + 1] = '\0';
+			buf[index + i + 1] = '\0';
 			*trigger = 1;
 			index = 0;
 			return (buf);
 		}
 	}
-	buf[index + var.bs_i] = '\0';
-	index += var.bs_i;
+	buf[index + i] = '\0';
+	index += i;
 	return (buf);
 }
 
